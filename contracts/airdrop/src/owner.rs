@@ -1,8 +1,8 @@
 use crate::*;
 use near_contract_standards::non_fungible_token::{events::NftMint, Token};
 
-
 #[witgen]
+/// A file with an account id on each line.
 /// @format data-url
 type AccountIdFile = String;
 
@@ -41,11 +41,21 @@ impl Contract {
         self.airdrop = Some(Airdrop::new(airdrop, self.nft_total_supply().0 as u64));
     }
 
-    /// Drop a set of NFTs in current campaign
+    /// Add accounts that will be dropped to. An account
+    /// can only be added once.
     /// @allow ["::admins", "::owner"]
     pub fn add_accounts(&mut self, accounts: AccountIdFile) {
         self.assert_owner_or_admin();
-        let accounts = accounts.split("\n").map(|s| s.trim()).map(|s|s.to_lowercase());
+        let url = DataUrl::process(&accounts).unwrap();
+        let accounts = url
+            .decode_to_vec()
+            .map(|(bytes, _)| unsafe { String::from_utf8_unchecked(bytes) })
+            .unwrap();
+        let accounts = accounts
+            .split("\n")
+            .map(|s| s.trim())
+            .filter(|s| *s != "")
+            .map(|s| s.to_lowercase());
         self.airdrop
             .as_mut()
             .expect("No current airdrop")

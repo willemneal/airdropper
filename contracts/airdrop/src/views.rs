@@ -17,4 +17,11 @@ impl Contract {
     pub fn nft_metadata(&self) -> NFTContractMetadata {
         self.metadata.get().unwrap()
     }
+
+    pub fn current_status(&self) -> String {
+      match self.airdrop.as_ref() {
+        Some(a)  => a.owners.len().to_string(),
+        None => "has not started".to_string(),
+      }
+    }
 }
