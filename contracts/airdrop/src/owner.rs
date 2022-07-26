@@ -1,4 +1,5 @@
 use crate::*;
+use data_url::DataUrl;
 use near_contract_standards::non_fungible_token::{events::NftMint, Token};
 
 #[witgen]
@@ -66,10 +67,8 @@ impl Contract {
     /// @allow ["::admins", "::owner"]
     pub fn drop_many(&mut self, num: u32) {
         // self.assert_owner_or_admin();
-        let tokens = self
-            .airdrop
-            .as_mut()
-            .expect("No current airdrop")
+        let airdrop = self.airdrop.as_mut().expect("No current airdrop");
+        let tokens = airdrop
             .drop_many(num)
             .into_iter()
             .map(|(owner_id, metadata, token_id)| {
@@ -77,6 +76,9 @@ impl Contract {
                     .internal_mint_with_refund(token_id, owner_id, Some(metadata), None)
             })
             .collect::<Vec<_>>();
+        if airdrop.is_empty() {
+            self.airdrop = None;
+        }
         env::log_str(&format!("{} gas burned", env::used_gas().0));
         for Token {
             token_id, owner_id, ..
