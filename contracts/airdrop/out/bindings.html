@@ -1,0 +1,904 @@
+<h1>Types</h1>
+<h2><a href="#account_id" name="account_id"></a> <a href="#account_id"><code>account-id</code></a>: record</h2>
+<p>Account identifier. This is the human readable utf8 string which is used internally to index
+accounts on the network and their respective state.</p>
+<p>Because these IDs have to be validated, they have to be converted from a string
+with <a href="std::str::FromStr"><code>FromStr</code></a> or [<code>TryFrom</code>] a compatible type. To skip validation on initialization,
+[<code>AccountId::new_unchecked</code>] can be used.</p>
+<h1>Examples</h1>
+<pre><code>use near_sdk::AccountId;
+use std::convert::{TryFrom, TryInto};
+
+// `FromStr` conversion
+let alice: AccountId = &quot;alice.near&quot;.parse().unwrap();
+assert!(&quot;invalid.&quot;.parse::&lt;AccountId&gt;().is_err());
+
+let alice_string = &quot;alice&quot;.to_string();
+
+// From string with validation
+let alice = AccountId::try_from(alice_string.clone()).unwrap();
+let alice: AccountId = alice_string.try_into().unwrap();
+
+// Initialize without validating
+let alice_unchecked = AccountId::new_unchecked(&quot;alice&quot;.to_string());
+assert_eq!(alice, alice_unchecked);
+</code></pre>
+<p>Size: 8, Alignment: 4</p>
+<h3>Record Fields</h3>
+<ul>
+<li><a href="account_id.0" name="account_id.0"></a> <a href="#account_id.0"><code>0</code></a>: <code>string</code></li>
+</ul>
+<h2><a href="#u128" name="u128"></a> <a href="#u128"><code>u128</code></a>: <code>string</code></h2>
+<p>Size: 8, Alignment: 4</p>
+<h2><a href="#balance" name="balance"></a> <a href="#balance"><code>balance</code></a>: <code>string</code></h2>
+<p>Balance is a type for storing amounts of tokens, specified in yoctoNEAR.</p>
+<p>Size: 8, Alignment: 4</p>
+<h2><a href="#base64_vec_u8" name="base64_vec_u8"></a> <a href="#base64_vec_u8"><code>base64-vec-u8</code></a>: record</h2>
+<p>Helper class to serialize/deserialize <code>Vec&lt;u8&gt;</code> to base64 string.</p>
+<p>Size: 8, Alignment: 4</p>
+<h3>Record Fields</h3>
+<ul>
+<li><a href="base64_vec_u8.0" name="base64_vec_u8.0"></a> <a href="#base64_vec_u8.0"><code>0</code></a>: list&lt;<code>u8</code>&gt;</li>
+</ul>
+<h2><a href="#basis_point" name="basis_point"></a> <a href="#basis_point"><code>basis-point</code></a>: <code>u16</code></h2>
+<p>Size: 2, Alignment: 2</p>
+<h2><a href="#block_height" name="block_height"></a> <a href="#block_height"><code>block-height</code></a>: <code>u64</code></h2>
+<p>Height of the block.</p>
+<p>Size: 8, Alignment: 8</p>
+<h2><a href="#block_height_delta" name="block_height_delta"></a> <a href="#block_height_delta"><code>block-height-delta</code></a>: <code>u64</code></h2>
+<p>Block height delta that measures the difference between <code>BlockHeight</code>s.</p>
+<p>Size: 8, Alignment: 8</p>
+<h2><a href="#epoch_height" name="epoch_height"></a> <a href="#epoch_height"><code>epoch-height</code></a>: <code>u64</code></h2>
+<p>Height of the epoch.</p>
+<p>Size: 8, Alignment: 8</p>
+<h2><a href="#nft_contract_metadata" name="nft_contract_metadata"></a> <a href="#nft_contract_metadata"><code>nft-contract-metadata</code></a>: record</h2>
+<p>Metadata for the NFT contract itself.</p>
+<p>Size: 72, Alignment: 4</p>
+<h3>Record Fields</h3>
+<ul>
+<li>
+<p><a href="nft_contract_metadata.spec" name="nft_contract_metadata.spec"></a> <a href="#nft_contract_metadata.spec"><code>spec</code></a>: <code>string</code></p>
+</li>
+<li>
+<p><a href="nft_contract_metadata.name" name="nft_contract_metadata.name"></a> <a href="#nft_contract_metadata.name"><code>name</code></a>: <code>string</code></p>
+</li>
+<li>
+<p><a href="nft_contract_metadata.symbol" name="nft_contract_metadata.symbol"></a> <a href="#nft_contract_metadata.symbol"><code>symbol</code></a>: <code>string</code></p>
+</li>
+<li>
+<p><a href="nft_contract_metadata.icon" name="nft_contract_metadata.icon"></a> <a href="#nft_contract_metadata.icon"><code>icon</code></a>: option&lt;<code>string</code>&gt;</p>
+</li>
+<li>
+<p><a href="nft_contract_metadata.base_uri" name="nft_contract_metadata.base_uri"></a> <a href="#nft_contract_metadata.base_uri"><code>base-uri</code></a>: option&lt;<code>string</code>&gt;</p>
+</li>
+<li>
+<p><a href="nft_contract_metadata.reference" name="nft_contract_metadata.reference"></a> <a href="#nft_contract_metadata.reference"><code>reference</code></a>: option&lt;<code>string</code>&gt;</p>
+</li>
+<li>
+<p><a href="nft_contract_metadata.reference_hash" name="nft_contract_metadata.reference_hash"></a> <a href="#nft_contract_metadata.reference_hash"><code>reference-hash</code></a>: option&lt;<a href="#base64_vec_u8"><a href="#base64_vec_u8"><code>base64-vec-u8</code></a></a>&gt;</p>
+</li>
+</ul>
+<h2><a href="#nonce" name="nonce"></a> <a href="#nonce"><code>nonce</code></a>: <code>u64</code></h2>
+<p>Nonce for transactions.</p>
+<p>Size: 8, Alignment: 8</p>
+<h2><a href="#num_blocks" name="num_blocks"></a> <a href="#num_blocks"><code>num-blocks</code></a>: <code>u64</code></h2>
+<p>Number of blocks in current group.</p>
+<p>Size: 8, Alignment: 8</p>
+<h2><a href="#num_seats" name="num_seats"></a> <a href="#num_seats"><code>num-seats</code></a>: <code>u64</code></h2>
+<p>Number of seats of validators (block producer or hidden ones) in current group (settlement).</p>
+<p>Size: 8, Alignment: 8</p>
+<h2><a href="#num_shards" name="num_shards"></a> <a href="#num_shards"><code>num-shards</code></a>: <code>u64</code></h2>
+<p>Number of shards in current group.</p>
+<p>Size: 8, Alignment: 8</p>
+<h2><a href="#promise" name="promise"></a> <a href="#promise"><code>promise</code></a>: <code>string</code></h2>
+<p>Size: 8, Alignment: 4</p>
+<h2><a href="#promise_id" name="promise_id"></a> <a href="#promise_id"><code>promise-id</code></a>: list&lt;<code>u64</code>&gt;</h2>
+<p>Size: 8, Alignment: 4</p>
+<h2><a href="#public_key" name="public_key"></a> <a href="#public_key"><code>public-key</code></a>: <code>string</code></h2>
+<p>Size: 8, Alignment: 4</p>
+<h2><a href="#shard_id" name="shard_id"></a> <a href="#shard_id"><code>shard-id</code></a>: <code>u64</code></h2>
+<p>Shard index, from 0 to NUM_SHARDS - 1.</p>
+<p>Size: 8, Alignment: 8</p>
+<h2><a href="#storage_usage" name="storage_usage"></a> <a href="#storage_usage"><code>storage-usage</code></a>: <code>u64</code></h2>
+<p>StorageUsage is used to count the amount of storage used by a contract.</p>
+<p>Size: 8, Alignment: 8</p>
+<h2><a href="#storage_usage_change" name="storage_usage_change"></a> <a href="#storage_usage_change"><code>storage-usage-change</code></a>: <code>s64</code></h2>
+<p>StorageUsageChange is used to count the storage usage within a single contract call.</p>
+<p>Size: 8, Alignment: 8</p>
+<h2><a href="#token_id" name="token_id"></a> <a href="#token_id"><code>token-id</code></a>: <code>string</code></h2>
+<p>Note that token IDs for NFTs are strings on NEAR. It's still fine to use autoincrementing numbers as unique IDs if desired, but they should be stringified. This is to make IDs more future-proof as chain-agnostic conventions and standards arise, and allows for more flexibility with considerations like bridging NFTs across chains, etc.</p>
+<p>Size: 8, Alignment: 4</p>
+<h2><a href="#token_metadata" name="token_metadata"></a> <a href="#token_metadata"><code>token-metadata</code></a>: record</h2>
+<p>Metadata on the individual token level.</p>
+<p>Size: 152, Alignment: 8</p>
+<h3>Record Fields</h3>
+<ul>
+<li>
+<p><a href="token_metadata.title" name="token_metadata.title"></a> <a href="#token_metadata.title"><code>title</code></a>: option&lt;<code>string</code>&gt;</p>
+</li>
+<li>
+<p><a href="token_metadata.description" name="token_metadata.description"></a> <a href="#token_metadata.description"><code>description</code></a>: option&lt;<code>string</code>&gt;</p>
+</li>
+<li>
+<p><a href="token_metadata.media" name="token_metadata.media"></a> <a href="#token_metadata.media"><code>media</code></a>: option&lt;<code>string</code>&gt;</p>
+</li>
+<li>
+<p><a href="token_metadata.media_hash" name="token_metadata.media_hash"></a> <a href="#token_metadata.media_hash"><code>media-hash</code></a>: option&lt;<a href="#base64_vec_u8"><a href="#base64_vec_u8"><code>base64-vec-u8</code></a></a>&gt;</p>
+</li>
+<li>
+<p><a href="token_metadata.copies" name="token_metadata.copies"></a> <a href="#token_metadata.copies"><code>copies</code></a>: option&lt;<code>u64</code>&gt;</p>
+</li>
+<li>
+<p><a href="token_metadata.issued_at" name="token_metadata.issued_at"></a> <a href="#token_metadata.issued_at"><code>issued-at</code></a>: option&lt;<code>string</code>&gt;</p>
+</li>
+<li>
+<p><a href="token_metadata.expires_at" name="token_metadata.expires_at"></a> <a href="#token_metadata.expires_at"><code>expires-at</code></a>: option&lt;<code>string</code>&gt;</p>
+</li>
+<li>
+<p><a href="token_metadata.starts_at" name="token_metadata.starts_at"></a> <a href="#token_metadata.starts_at"><code>starts-at</code></a>: option&lt;<code>string</code>&gt;</p>
+</li>
+<li>
+<p><a href="token_metadata.updated_at" name="token_metadata.updated_at"></a> <a href="#token_metadata.updated_at"><code>updated-at</code></a>: option&lt;<code>string</code>&gt;</p>
+</li>
+<li>
+<p><a href="token_metadata.extra" name="token_metadata.extra"></a> <a href="#token_metadata.extra"><code>extra</code></a>: option&lt;<code>string</code>&gt;</p>
+</li>
+<li>
+<p><a href="token_metadata.reference" name="token_metadata.reference"></a> <a href="#token_metadata.reference"><code>reference</code></a>: option&lt;<code>string</code>&gt;</p>
+</li>
+<li>
+<p><a href="token_metadata.reference_hash" name="token_metadata.reference_hash"></a> <a href="#token_metadata.reference_hash"><code>reference-hash</code></a>: option&lt;<a href="#base64_vec_u8"><a href="#base64_vec_u8"><code>base64-vec-u8</code></a></a>&gt;</p>
+</li>
+</ul>
+<h2><a href="#token" name="token"></a> <a href="#token"><code>token</code></a>: record</h2>
+<p>Size: 192, Alignment: 8</p>
+<h3>Record Fields</h3>
+<ul>
+<li>
+<p><a href="token.token_id" name="token.token_id"></a> <a href="#token.token_id"><a href="#token_id"><code>token-id</code></a></a>: <a href="#token_id"><a href="#token_id"><code>token-id</code></a></a></p>
+</li>
+<li>
+<p><a href="token.owner_id" name="token.owner_id"></a> <a href="#token.owner_id"><code>owner-id</code></a>: <a href="#account_id"><a href="#account_id"><code>account-id</code></a></a></p>
+</li>
+<li>
+<p><a href="token.metadata" name="token.metadata"></a> <a href="#token.metadata"><code>metadata</code></a>: option&lt;<a href="#token_metadata"><a href="#token_metadata"><code>token-metadata</code></a></a>&gt;</p>
+</li>
+<li>
+<p><a href="token.approved_account_ids" name="token.approved_account_ids"></a> <a href="#token.approved_account_ids"><code>approved-account-ids</code></a>: option&lt;list&lt;(<a href="#account_id"><a href="#account_id"><code>account-id</code></a></a>, <code>u64</code>)&gt;&gt;</p>
+</li>
+</ul>
+<h2><a href="#validator_id" name="validator_id"></a> <a href="#validator_id"><code>validator-id</code></a>: <code>u64</code></h2>
+<p>Validator identifier in current group.</p>
+<p>Size: 8, Alignment: 8</p>
+<h2><a href="#validator_mask" name="validator_mask"></a> <a href="#validator_mask"><code>validator-mask</code></a>: list&lt;<code>bool</code>&gt;</h2>
+<p>Mask which validators participated in multi sign.</p>
+<p>Size: 8, Alignment: 4</p>
+<h2><a href="#nft_transfer_payout_args" name="nft_transfer_payout_args"></a> <a href="#nft_transfer_payout_args"><code>nft-transfer-payout-args</code></a>: record</h2>
+<p>Size: 64, Alignment: 8</p>
+<h3>Record Fields</h3>
+<ul>
+<li>
+<p><a href="nft_transfer_payout_args.receiver_id" name="nft_transfer_payout_args.receiver_id"></a> <a href="#nft_transfer_payout_args.receiver_id"><code>receiver-id</code></a>: <a href="#account_id"><a href="#account_id"><code>account-id</code></a></a></p>
+</li>
+<li>
+<p><a href="nft_transfer_payout_args.token_id" name="nft_transfer_payout_args.token_id"></a> <a href="#nft_transfer_payout_args.token_id"><a href="#token_id"><code>token-id</code></a></a>: <code>string</code></p>
+</li>
+<li>
+<p><a href="nft_transfer_payout_args.approval_id" name="nft_transfer_payout_args.approval_id"></a> <a href="#nft_transfer_payout_args.approval_id"><code>approval-id</code></a>: option&lt;<code>u64</code>&gt;</p>
+</li>
+<li>
+<p><a href="nft_transfer_payout_args.memo" name="nft_transfer_payout_args.memo"></a> <a href="#nft_transfer_payout_args.memo"><code>memo</code></a>: option&lt;<code>string</code>&gt;</p>
+</li>
+<li>
+<p><a href="nft_transfer_payout_args.balance" name="nft_transfer_payout_args.balance"></a> <a href="#nft_transfer_payout_args.balance"><a href="#balance"><code>balance</code></a></a>: <a href="#u128"><a href="#u128"><code>u128</code></a></a></p>
+</li>
+<li>
+<p><a href="nft_transfer_payout_args.max_len_payout" name="nft_transfer_payout_args.max_len_payout"></a> <a href="#nft_transfer_payout_args.max_len_payout"><code>max-len-payout</code></a>: option&lt;<code>u32</code>&gt;</p>
+</li>
+</ul>
+<h2><a href="#claim_args" name="claim_args"></a> <a href="#claim_args"><code>claim-args</code></a>: record</h2>
+<p>Size: 8, Alignment: 4</p>
+<h3>Record Fields</h3>
+<ul>
+<li><a href="claim_args.account_id" name="claim_args.account_id"></a> <a href="#claim_args.account_id"><a href="#account_id"><code>account-id</code></a></a>: <a href="#account_id"><a href="#account_id"><code>account-id</code></a></a></li>
+</ul>
+<h2><a href="#cost_of_linkdrop_args" name="cost_of_linkdrop_args"></a> <a href="#cost_of_linkdrop_args"><code>cost-of-linkdrop-args</code></a>: record</h2>
+<p>Size: 8, Alignment: 4</p>
+<h3>Record Fields</h3>
+<ul>
+<li><a href="cost_of_linkdrop_args.minter" name="cost_of_linkdrop_args.minter"></a> <a href="#cost_of_linkdrop_args.minter"><code>minter</code></a>: <a href="#account_id"><a href="#account_id"><code>account-id</code></a></a></li>
+</ul>
+<h2><a href="#nft_approve_args" name="nft_approve_args"></a> <a href="#nft_approve_args"><code>nft-approve-args</code></a>: record</h2>
+<p>Size: 28, Alignment: 4</p>
+<h3>Record Fields</h3>
+<ul>
+<li>
+<p><a href="nft_approve_args.token_id" name="nft_approve_args.token_id"></a> <a href="#nft_approve_args.token_id"><a href="#token_id"><code>token-id</code></a></a>: <a href="#token_id"><a href="#token_id"><code>token-id</code></a></a></p>
+</li>
+<li>
+<p><a href="nft_approve_args.account_id" name="nft_approve_args.account_id"></a> <a href="#nft_approve_args.account_id"><a href="#account_id"><code>account-id</code></a></a>: <a href="#account_id"><a href="#account_id"><code>account-id</code></a></a></p>
+</li>
+<li>
+<p><a href="nft_approve_args.msg" name="nft_approve_args.msg"></a> <a href="#nft_approve_args.msg"><code>msg</code></a>: option&lt;<code>string</code>&gt;</p>
+</li>
+</ul>
+<h2><a href="#on_create_and_claim_args" name="on_create_and_claim_args"></a> <a href="#on_create_and_claim_args"><code>on-create-and-claim-args</code></a>: record</h2>
+<p>Size: 1, Alignment: 1</p>
+<h3>Record Fields</h3>
+<ul>
+<li>
+<p><a href="on_create_and_claim_args.mint_for_free" name="on_create_and_claim_args.mint_for_free"></a> <a href="#on_create_and_claim_args.mint_for_free"><code>mint-for-free</code></a>: <code>bool</code></p>
+<p>Bit: 0</p>
+</li>
+</ul>
+<h2><a href="#total_cost_args" name="total_cost_args"></a> <a href="#total_cost_args"><code>total-cost-args</code></a>: record</h2>
+<p>Size: 12, Alignment: 4</p>
+<h3>Record Fields</h3>
+<ul>
+<li>
+<p><a href="total_cost_args.num" name="total_cost_args.num"></a> <a href="#total_cost_args.num"><code>num</code></a>: <code>u32</code></p>
+</li>
+<li>
+<p><a href="total_cost_args.minter" name="total_cost_args.minter"></a> <a href="#total_cost_args.minter"><code>minter</code></a>: <a href="#account_id"><a href="#account_id"><code>account-id</code></a></a></p>
+</li>
+</ul>
+<h2><a href="#nft_revoke_args" name="nft_revoke_args"></a> <a href="#nft_revoke_args"><code>nft-revoke-args</code></a>: record</h2>
+<p>Size: 16, Alignment: 4</p>
+<h3>Record Fields</h3>
+<ul>
+<li>
+<p><a href="nft_revoke_args.token_id" name="nft_revoke_args.token_id"></a> <a href="#nft_revoke_args.token_id"><a href="#token_id"><code>token-id</code></a></a>: <a href="#token_id"><a href="#token_id"><code>token-id</code></a></a></p>
+</li>
+<li>
+<p><a href="nft_revoke_args.account_id" name="nft_revoke_args.account_id"></a> <a href="#nft_revoke_args.account_id"><a href="#account_id"><code>account-id</code></a></a>: <a href="#account_id"><a href="#account_id"><code>account-id</code></a></a></p>
+</li>
+</ul>
+<h2><a href="#add_whitelist_accounts_args" name="add_whitelist_accounts_args"></a> <a href="#add_whitelist_accounts_args"><code>add-whitelist-accounts-args</code></a>: record</h2>
+<p>Size: 16, Alignment: 4</p>
+<h3>Record Fields</h3>
+<ul>
+<li>
+<p><a href="add_whitelist_accounts_args.accounts" name="add_whitelist_accounts_args.accounts"></a> <a href="#add_whitelist_accounts_args.accounts"><code>accounts</code></a>: list&lt;<a href="#account_id"><a href="#account_id"><code>account-id</code></a></a>&gt;</p>
+</li>
+<li>
+<p><a href="add_whitelist_accounts_args.allowance" name="add_whitelist_accounts_args.allowance"></a> <a href="#add_whitelist_accounts_args.allowance"><code>allowance</code></a>: option&lt;<code>u32</code>&gt;</p>
+</li>
+</ul>
+<h2><a href="#check_key_args" name="check_key_args"></a> <a href="#check_key_args"><code>check-key-args</code></a>: record</h2>
+<p>Size: 8, Alignment: 4</p>
+<h3>Record Fields</h3>
+<ul>
+<li><a href="check_key_args.public_key" name="check_key_args.public_key"></a> <a href="#check_key_args.public_key"><a href="#public_key"><code>public-key</code></a></a>: <a href="#public_key"><a href="#public_key"><code>public-key</code></a></a></li>
+</ul>
+<h2><a href="#new_default_meta_args" name="new_default_meta_args"></a> <a href="#new_default_meta_args"><code>new-default-meta-args</code></a>: record</h2>
+<p>Size: 148, Alignment: 4</p>
+<h3>Record Fields</h3>
+<ul>
+<li>
+<p><a href="new_default_meta_args.owner_id" name="new_default_meta_args.owner_id"></a> <a href="#new_default_meta_args.owner_id"><code>owner-id</code></a>: <a href="#account_id"><a href="#account_id"><code>account-id</code></a></a></p>
+</li>
+<li>
+<p><a href="new_default_meta_args.name" name="new_default_meta_args.name"></a> <a href="#new_default_meta_args.name"><code>name</code></a>: <code>string</code></p>
+</li>
+<li>
+<p><a href="new_default_meta_args.symbol" name="new_default_meta_args.symbol"></a> <a href="#new_default_meta_args.symbol"><code>symbol</code></a>: <code>string</code></p>
+</li>
+<li>
+<p><a href="new_default_meta_args.uri" name="new_default_meta_args.uri"></a> <a href="#new_default_meta_args.uri"><code>uri</code></a>: <code>string</code></p>
+</li>
+<li>
+<p><a href="new_default_meta_args.size" name="new_default_meta_args.size"></a> <a href="#new_default_meta_args.size"><code>size</code></a>: <code>u32</code></p>
+</li>
+<li>
+<p><a href="new_default_meta_args.base_cost" name="new_default_meta_args.base_cost"></a> <a href="#new_default_meta_args.base_cost"><code>base-cost</code></a>: <a href="#u128"><a href="#u128"><code>u128</code></a></a></p>
+</li>
+<li>
+<p><a href="new_default_meta_args.min_cost" name="new_default_meta_args.min_cost"></a> <a href="#new_default_meta_args.min_cost"><code>min-cost</code></a>: <a href="#u128"><a href="#u128"><code>u128</code></a></a></p>
+</li>
+<li>
+<p><a href="new_default_meta_args.percent_off" name="new_default_meta_args.percent_off"></a> <a href="#new_default_meta_args.percent_off"><code>percent-off</code></a>: option&lt;<code>u8</code>&gt;</p>
+</li>
+<li>
+<p><a href="new_default_meta_args.icon" name="new_default_meta_args.icon"></a> <a href="#new_default_meta_args.icon"><code>icon</code></a>: option&lt;<code>string</code>&gt;</p>
+</li>
+<li>
+<p><a href="new_default_meta_args.spec" name="new_default_meta_args.spec"></a> <a href="#new_default_meta_args.spec"><code>spec</code></a>: option&lt;<code>string</code>&gt;</p>
+</li>
+<li>
+<p><a href="new_default_meta_args.reference" name="new_default_meta_args.reference"></a> <a href="#new_default_meta_args.reference"><code>reference</code></a>: option&lt;<code>string</code>&gt;</p>
+</li>
+<li>
+<p><a href="new_default_meta_args.reference_hash" name="new_default_meta_args.reference_hash"></a> <a href="#new_default_meta_args.reference_hash"><code>reference-hash</code></a>: option&lt;<a href="#base64_vec_u8"><a href="#base64_vec_u8"><code>base64-vec-u8</code></a></a>&gt;</p>
+</li>
+<li>
+<p><a href="new_default_meta_args.royalties" name="new_default_meta_args.royalties"></a> <a href="#new_default_meta_args.royalties"><a href="#royalties"><code>royalties</code></a></a>: option&lt;<a href="#royalties"><a href="#royalties"><code>royalties</code></a></a>&gt;</p>
+</li>
+<li>
+<p><a href="new_default_meta_args.initial_royalties" name="new_default_meta_args.initial_royalties"></a> <a href="#new_default_meta_args.initial_royalties"><code>initial-royalties</code></a>: option&lt;<a href="#royalties"><a href="#royalties"><code>royalties</code></a></a>&gt;</p>
+</li>
+<li>
+<p><a href="new_default_meta_args.is_premint" name="new_default_meta_args.is_premint"></a> <a href="#new_default_meta_args.is_premint"><code>is-premint</code></a>: option&lt;<code>bool</code>&gt;</p>
+</li>
+<li>
+<p><a href="new_default_meta_args.is_premint_over" name="new_default_meta_args.is_premint_over"></a> <a href="#new_default_meta_args.is_premint_over"><code>is-premint-over</code></a>: option&lt;<code>bool</code>&gt;</p>
+</li>
+<li>
+<p><a href="new_default_meta_args.allowance" name="new_default_meta_args.allowance"></a> <a href="#new_default_meta_args.allowance"><code>allowance</code></a>: option&lt;<code>u32</code>&gt;</p>
+</li>
+</ul>
+<h2><a href="#new_args" name="new_args"></a> <a href="#new_args"><code>new-args</code></a>: record</h2>
+<p>Size: 160, Alignment: 8</p>
+<h3>Record Fields</h3>
+<ul>
+<li>
+<p><a href="new_args.owner_id" name="new_args.owner_id"></a> <a href="#new_args.owner_id"><code>owner-id</code></a>: <a href="#account_id"><a href="#account_id"><code>account-id</code></a></a></p>
+</li>
+<li>
+<p><a href="new_args.metadata" name="new_args.metadata"></a> <a href="#new_args.metadata"><code>metadata</code></a>: <a href="#nft_contract_metadata"><a href="#nft_contract_metadata"><code>nft-contract-metadata</code></a></a></p>
+</li>
+<li>
+<p><a href="new_args.size" name="new_args.size"></a> <a href="#new_args.size"><code>size</code></a>: <code>u32</code></p>
+</li>
+<li>
+<p><a href="new_args.base_cost" name="new_args.base_cost"></a> <a href="#new_args.base_cost"><code>base-cost</code></a>: <a href="#u128"><a href="#u128"><code>u128</code></a></a></p>
+</li>
+<li>
+<p><a href="new_args.min_cost" name="new_args.min_cost"></a> <a href="#new_args.min_cost"><code>min-cost</code></a>: <a href="#u128"><a href="#u128"><code>u128</code></a></a></p>
+</li>
+<li>
+<p><a href="new_args.percent_off" name="new_args.percent_off"></a> <a href="#new_args.percent_off"><code>percent-off</code></a>: <code>u8</code></p>
+</li>
+<li>
+<p><a href="new_args.royalties" name="new_args.royalties"></a> <a href="#new_args.royalties"><a href="#royalties"><code>royalties</code></a></a>: option&lt;<a href="#royalties"><a href="#royalties"><code>royalties</code></a></a>&gt;</p>
+</li>
+<li>
+<p><a href="new_args.initial_royalties" name="new_args.initial_royalties"></a> <a href="#new_args.initial_royalties"><code>initial-royalties</code></a>: option&lt;<a href="#royalties"><a href="#royalties"><code>royalties</code></a></a>&gt;</p>
+</li>
+<li>
+<p><a href="new_args.is_premint" name="new_args.is_premint"></a> <a href="#new_args.is_premint"><code>is-premint</code></a>: <code>bool</code></p>
+</li>
+<li>
+<p><a href="new_args.is_premint_over" name="new_args.is_premint_over"></a> <a href="#new_args.is_premint_over"><code>is-premint-over</code></a>: <code>bool</code></p>
+</li>
+<li>
+<p><a href="new_args.premint_deadline_at" name="new_args.premint_deadline_at"></a> <a href="#new_args.premint_deadline_at"><code>premint-deadline-at</code></a>: <code>u64</code></p>
+</li>
+<li>
+<p><a href="new_args.allowance" name="new_args.allowance"></a> <a href="#new_args.allowance"><code>allowance</code></a>: option&lt;<code>u32</code>&gt;</p>
+</li>
+</ul>
+<h2><a href="#nft_mint_many_args" name="nft_mint_many_args"></a> <a href="#nft_mint_many_args"><code>nft-mint-many-args</code></a>: record</h2>
+<p>Size: 4, Alignment: 4</p>
+<h3>Record Fields</h3>
+<ul>
+<li><a href="nft_mint_many_args.num" name="nft_mint_many_args.num"></a> <a href="#nft_mint_many_args.num"><code>num</code></a>: <code>u32</code></li>
+</ul>
+<h2><a href="#whitelisted_args" name="whitelisted_args"></a> <a href="#whitelisted_args"><code>whitelisted-args</code></a>: record</h2>
+<p>Size: 8, Alignment: 4</p>
+<h3>Record Fields</h3>
+<ul>
+<li><a href="whitelisted_args.account_id" name="whitelisted_args.account_id"></a> <a href="#whitelisted_args.account_id"><a href="#account_id"><code>account-id</code></a></a>: <a href="#account_id"><a href="#account_id"><code>account-id</code></a></a></li>
+</ul>
+<h2><a href="#create_linkdrop_args" name="create_linkdrop_args"></a> <a href="#create_linkdrop_args"><code>create-linkdrop-args</code></a>: record</h2>
+<p>Size: 8, Alignment: 4</p>
+<h3>Record Fields</h3>
+<ul>
+<li><a href="create_linkdrop_args.public_key" name="create_linkdrop_args.public_key"></a> <a href="#create_linkdrop_args.public_key"><a href="#public_key"><code>public-key</code></a></a>: <a href="#public_key"><a href="#public_key"><code>public-key</code></a></a></li>
+</ul>
+<h2><a href="#nft_resolve_transfer_args" name="nft_resolve_transfer_args"></a> <a href="#nft_resolve_transfer_args"><code>nft-resolve-transfer-args</code></a>: record</h2>
+<p>Size: 36, Alignment: 4</p>
+<h3>Record Fields</h3>
+<ul>
+<li>
+<p><a href="nft_resolve_transfer_args.previous_owner_id" name="nft_resolve_transfer_args.previous_owner_id"></a> <a href="#nft_resolve_transfer_args.previous_owner_id"><code>previous-owner-id</code></a>: <a href="#account_id"><a href="#account_id"><code>account-id</code></a></a></p>
+</li>
+<li>
+<p><a href="nft_resolve_transfer_args.receiver_id" name="nft_resolve_transfer_args.receiver_id"></a> <a href="#nft_resolve_transfer_args.receiver_id"><code>receiver-id</code></a>: <a href="#account_id"><a href="#account_id"><code>account-id</code></a></a></p>
+</li>
+<li>
+<p><a href="nft_resolve_transfer_args.token_id" name="nft_resolve_transfer_args.token_id"></a> <a href="#nft_resolve_transfer_args.token_id"><a href="#token_id"><code>token-id</code></a></a>: <a href="#token_id"><a href="#token_id"><code>token-id</code></a></a></p>
+</li>
+<li>
+<p><a href="nft_resolve_transfer_args.approved_account_ids" name="nft_resolve_transfer_args.approved_account_ids"></a> <a href="#nft_resolve_transfer_args.approved_account_ids"><code>approved-account-ids</code></a>: option&lt;list&lt;(<a href="#account_id"><a href="#account_id"><code>account-id</code></a></a>, <code>u64</code>)&gt;&gt;</p>
+</li>
+</ul>
+<h2><a href="#end_premint_args" name="end_premint_args"></a> <a href="#end_premint_args"><code>end-premint-args</code></a>: record</h2>
+<p>Size: 20, Alignment: 4</p>
+<h3>Record Fields</h3>
+<ul>
+<li>
+<p><a href="end_premint_args.base_cost" name="end_premint_args.base_cost"></a> <a href="#end_premint_args.base_cost"><code>base-cost</code></a>: <a href="#u128"><a href="#u128"><code>u128</code></a></a></p>
+</li>
+<li>
+<p><a href="end_premint_args.min_cost" name="end_premint_args.min_cost"></a> <a href="#end_premint_args.min_cost"><code>min-cost</code></a>: <a href="#u128"><a href="#u128"><code>u128</code></a></a></p>
+</li>
+<li>
+<p><a href="end_premint_args.percent_off" name="end_premint_args.percent_off"></a> <a href="#end_premint_args.percent_off"><code>percent-off</code></a>: option&lt;<code>u8</code>&gt;</p>
+</li>
+</ul>
+<h2><a href="#nft_token_args" name="nft_token_args"></a> <a href="#nft_token_args"><code>nft-token-args</code></a>: record</h2>
+<p>Size: 8, Alignment: 4</p>
+<h3>Record Fields</h3>
+<ul>
+<li><a href="nft_token_args.token_id" name="nft_token_args.token_id"></a> <a href="#nft_token_args.token_id"><a href="#token_id"><code>token-id</code></a></a>: <a href="#token_id"><a href="#token_id"><code>token-id</code></a></a></li>
+</ul>
+<h2><a href="#add_whitelist_account_ungaurded_args" name="add_whitelist_account_ungaurded_args"></a> <a href="#add_whitelist_account_ungaurded_args"><code>add-whitelist-account-ungaurded-args</code></a>: record</h2>
+<p>Size: 12, Alignment: 4</p>
+<h3>Record Fields</h3>
+<ul>
+<li>
+<p><a href="add_whitelist_account_ungaurded_args.account_id" name="add_whitelist_account_ungaurded_args.account_id"></a> <a href="#add_whitelist_account_ungaurded_args.account_id"><a href="#account_id"><code>account-id</code></a></a>: <a href="#account_id"><a href="#account_id"><code>account-id</code></a></a></p>
+</li>
+<li>
+<p><a href="add_whitelist_account_ungaurded_args.allowance" name="add_whitelist_account_ungaurded_args.allowance"></a> <a href="#add_whitelist_account_ungaurded_args.allowance"><code>allowance</code></a>: <code>u32</code></p>
+</li>
+</ul>
+<h2><a href="#start_premint_args" name="start_premint_args"></a> <a href="#start_premint_args"><code>start-premint-args</code></a>: record</h2>
+<p>Size: 8, Alignment: 8</p>
+<h3>Record Fields</h3>
+<ul>
+<li><a href="start_premint_args.duration" name="start_premint_args.duration"></a> <a href="#start_premint_args.duration"><code>duration</code></a>: <code>u64</code></li>
+</ul>
+<h2><a href="#remaining_allowance_args" name="remaining_allowance_args"></a> <a href="#remaining_allowance_args"><code>remaining-allowance-args</code></a>: record</h2>
+<p>Size: 8, Alignment: 4</p>
+<h3>Record Fields</h3>
+<ul>
+<li><a href="remaining_allowance_args.account_id" name="remaining_allowance_args.account_id"></a> <a href="#remaining_allowance_args.account_id"><a href="#account_id"><code>account-id</code></a></a>: <a href="#account_id"><a href="#account_id"><code>account-id</code></a></a></li>
+</ul>
+<h2><a href="#create_account_and_claim_args" name="create_account_and_claim_args"></a> <a href="#create_account_and_claim_args"><code>create-account-and-claim-args</code></a>: record</h2>
+<p>Size: 16, Alignment: 4</p>
+<h3>Record Fields</h3>
+<ul>
+<li>
+<p><a href="create_account_and_claim_args.new_account_id" name="create_account_and_claim_args.new_account_id"></a> <a href="#create_account_and_claim_args.new_account_id"><code>new-account-id</code></a>: <a href="#account_id"><a href="#account_id"><code>account-id</code></a></a></p>
+</li>
+<li>
+<p><a href="create_account_and_claim_args.new_public_key" name="create_account_and_claim_args.new_public_key"></a> <a href="#create_account_and_claim_args.new_public_key"><code>new-public-key</code></a>: <a href="#public_key"><a href="#public_key"><code>public-key</code></a></a></p>
+</li>
+</ul>
+<h2><a href="#discount_args" name="discount_args"></a> <a href="#discount_args"><code>discount-args</code></a>: record</h2>
+<p>Size: 4, Alignment: 4</p>
+<h3>Record Fields</h3>
+<ul>
+<li><a href="discount_args.num" name="discount_args.num"></a> <a href="#discount_args.num"><code>num</code></a>: <code>u32</code></li>
+</ul>
+<h2><a href="#link_callback_args" name="link_callback_args"></a> <a href="#link_callback_args"><code>link-callback-args</code></a>: record</h2>
+<p>Size: 12, Alignment: 4</p>
+<h3>Record Fields</h3>
+<ul>
+<li>
+<p><a href="link_callback_args.account_id" name="link_callback_args.account_id"></a> <a href="#link_callback_args.account_id"><a href="#account_id"><code>account-id</code></a></a>: <a href="#account_id"><a href="#account_id"><code>account-id</code></a></a></p>
+</li>
+<li>
+<p><a href="link_callback_args.mint_for_free" name="link_callback_args.mint_for_free"></a> <a href="#link_callback_args.mint_for_free"><code>mint-for-free</code></a>: <code>bool</code></p>
+</li>
+</ul>
+<h2><a href="#cost_per_token_args" name="cost_per_token_args"></a> <a href="#cost_per_token_args"><code>cost-per-token-args</code></a>: record</h2>
+<p>Size: 12, Alignment: 4</p>
+<h3>Record Fields</h3>
+<ul>
+<li>
+<p><a href="cost_per_token_args.num" name="cost_per_token_args.num"></a> <a href="#cost_per_token_args.num"><code>num</code></a>: <code>u32</code></p>
+</li>
+<li>
+<p><a href="cost_per_token_args.minter" name="cost_per_token_args.minter"></a> <a href="#cost_per_token_args.minter"><code>minter</code></a>: <a href="#account_id"><a href="#account_id"><code>account-id</code></a></a></p>
+</li>
+</ul>
+<h2><a href="#nft_payout_args" name="nft_payout_args"></a> <a href="#nft_payout_args"><code>nft-payout-args</code></a>: record</h2>
+<p>Size: 24, Alignment: 4</p>
+<h3>Record Fields</h3>
+<ul>
+<li>
+<p><a href="nft_payout_args.token_id" name="nft_payout_args.token_id"></a> <a href="#nft_payout_args.token_id"><a href="#token_id"><code>token-id</code></a></a>: <code>string</code></p>
+</li>
+<li>
+<p><a href="nft_payout_args.balance" name="nft_payout_args.balance"></a> <a href="#nft_payout_args.balance"><a href="#balance"><code>balance</code></a></a>: <a href="#u128"><a href="#u128"><code>u128</code></a></a></p>
+</li>
+<li>
+<p><a href="nft_payout_args.max_len_payout" name="nft_payout_args.max_len_payout"></a> <a href="#nft_payout_args.max_len_payout"><code>max-len-payout</code></a>: option&lt;<code>u32</code>&gt;</p>
+</li>
+</ul>
+<h2><a href="#nft_mint_args" name="nft_mint_args"></a> <a href="#nft_mint_args"><code>nft-mint-args</code></a>: record</h2>
+<p>Size: 168, Alignment: 8</p>
+<h3>Record Fields</h3>
+<ul>
+<li>
+<p><a href="nft_mint_args.token_id" name="nft_mint_args.token_id"></a> <a href="#nft_mint_args.token_id"><a href="#token_id"><code>token-id</code></a></a>: <a href="#token_id"><a href="#token_id"><code>token-id</code></a></a></p>
+</li>
+<li>
+<p><a href="nft_mint_args.token_owner_id" name="nft_mint_args.token_owner_id"></a> <a href="#nft_mint_args.token_owner_id"><code>token-owner-id</code></a>: <a href="#account_id"><a href="#account_id"><code>account-id</code></a></a></p>
+</li>
+<li>
+<p><a href="nft_mint_args.token_metadata" name="nft_mint_args.token_metadata"></a> <a href="#nft_mint_args.token_metadata"><a href="#token_metadata"><code>token-metadata</code></a></a>: <a href="#token_metadata"><a href="#token_metadata"><code>token-metadata</code></a></a></p>
+</li>
+</ul>
+<h2><a href="#nft_transfer_args" name="nft_transfer_args"></a> <a href="#nft_transfer_args"><code>nft-transfer-args</code></a>: record</h2>
+<p>Size: 48, Alignment: 8</p>
+<h3>Record Fields</h3>
+<ul>
+<li>
+<p><a href="nft_transfer_args.receiver_id" name="nft_transfer_args.receiver_id"></a> <a href="#nft_transfer_args.receiver_id"><code>receiver-id</code></a>: <a href="#account_id"><a href="#account_id"><code>account-id</code></a></a></p>
+</li>
+<li>
+<p><a href="nft_transfer_args.token_id" name="nft_transfer_args.token_id"></a> <a href="#nft_transfer_args.token_id"><a href="#token_id"><code>token-id</code></a></a>: <a href="#token_id"><a href="#token_id"><code>token-id</code></a></a></p>
+</li>
+<li>
+<p><a href="nft_transfer_args.approval_id" name="nft_transfer_args.approval_id"></a> <a href="#nft_transfer_args.approval_id"><code>approval-id</code></a>: option&lt;<code>u64</code>&gt;</p>
+</li>
+<li>
+<p><a href="nft_transfer_args.memo" name="nft_transfer_args.memo"></a> <a href="#nft_transfer_args.memo"><code>memo</code></a>: option&lt;<code>string</code>&gt;</p>
+</li>
+</ul>
+<h2><a href="#update_royalties_args" name="update_royalties_args"></a> <a href="#update_royalties_args"><code>update-royalties-args</code></a>: record</h2>
+<p>Size: 12, Alignment: 4</p>
+<h3>Record Fields</h3>
+<ul>
+<li><a href="update_royalties_args.royalties" name="update_royalties_args.royalties"></a> <a href="#update_royalties_args.royalties"><a href="#royalties"><code>royalties</code></a></a>: <a href="#royalties"><a href="#royalties"><code>royalties</code></a></a></li>
+</ul>
+<h2><a href="#nft_revoke_all_args" name="nft_revoke_all_args"></a> <a href="#nft_revoke_all_args"><code>nft-revoke-all-args</code></a>: record</h2>
+<p>Size: 8, Alignment: 4</p>
+<h3>Record Fields</h3>
+<ul>
+<li><a href="nft_revoke_all_args.token_id" name="nft_revoke_all_args.token_id"></a> <a href="#nft_revoke_all_args.token_id"><a href="#token_id"><code>token-id</code></a></a>: <a href="#token_id"><a href="#token_id"><code>token-id</code></a></a></li>
+</ul>
+<h2><a href="#nft_is_approved_args" name="nft_is_approved_args"></a> <a href="#nft_is_approved_args"><code>nft-is-approved-args</code></a>: record</h2>
+<p>Size: 32, Alignment: 8</p>
+<h3>Record Fields</h3>
+<ul>
+<li>
+<p><a href="nft_is_approved_args.token_id" name="nft_is_approved_args.token_id"></a> <a href="#nft_is_approved_args.token_id"><a href="#token_id"><code>token-id</code></a></a>: <a href="#token_id"><a href="#token_id"><code>token-id</code></a></a></p>
+</li>
+<li>
+<p><a href="nft_is_approved_args.approved_account_id" name="nft_is_approved_args.approved_account_id"></a> <a href="#nft_is_approved_args.approved_account_id"><code>approved-account-id</code></a>: <a href="#account_id"><a href="#account_id"><code>account-id</code></a></a></p>
+</li>
+<li>
+<p><a href="nft_is_approved_args.approval_id" name="nft_is_approved_args.approval_id"></a> <a href="#nft_is_approved_args.approval_id"><code>approval-id</code></a>: option&lt;<code>u64</code>&gt;</p>
+</li>
+</ul>
+<h2><a href="#transfer_ownership_args" name="transfer_ownership_args"></a> <a href="#transfer_ownership_args"><code>transfer-ownership-args</code></a>: record</h2>
+<p>Size: 8, Alignment: 4</p>
+<h3>Record Fields</h3>
+<ul>
+<li><a href="transfer_ownership_args.new_owner" name="transfer_ownership_args.new_owner"></a> <a href="#transfer_ownership_args.new_owner"><code>new-owner</code></a>: <a href="#account_id"><a href="#account_id"><code>account-id</code></a></a></li>
+</ul>
+<h2><a href="#payout" name="payout"></a> <a href="#payout"><code>payout</code></a>: record</h2>
+<p>Copied from https://github.com/near/NEPs/blob/6170aba1c6f4cd4804e9ad442caeae9dc47e7d44/specs/Standards/NonFungibleToken/Payout.md#reference-level-explanation
+A mapping of NEAR accounts to the amount each should be paid out, in
+the event of a token-sale. The payout mapping MUST be shorter than the
+maximum length specified by the financial contract obtaining this
+payout data. Any mapping of length 10 or less MUST be accepted by
+financial contracts, so 10 is a safe upper limit.
+This currently deviates from the standard but is in the process of updating to use this type</p>
+<p>Size: 8, Alignment: 4</p>
+<h3>Record Fields</h3>
+<ul>
+<li><a href="payout.payout" name="payout.payout"></a> <a href="#payout.payout"><a href="#payout"><code>payout</code></a></a>: list&lt;(<a href="#account_id"><a href="#account_id"><code>account-id</code></a></a>, <a href="#u128"><a href="#u128"><code>u128</code></a></a>)&gt;</li>
+</ul>
+<h2><a href="#update_allowance_args" name="update_allowance_args"></a> <a href="#update_allowance_args"><code>update-allowance-args</code></a>: record</h2>
+<p>Size: 4, Alignment: 4</p>
+<h3>Record Fields</h3>
+<ul>
+<li><a href="update_allowance_args.allowance" name="update_allowance_args.allowance"></a> <a href="#update_allowance_args.allowance"><code>allowance</code></a>: <code>u32</code></li>
+</ul>
+<h2><a href="#royalties" name="royalties"></a> <a href="#royalties"><code>royalties</code></a>: record</h2>
+<p>Size: 12, Alignment: 4</p>
+<h3>Record Fields</h3>
+<ul>
+<li>
+<p><a href="royalties.accounts" name="royalties.accounts"></a> <a href="#royalties.accounts"><code>accounts</code></a>: list&lt;(<a href="#account_id"><a href="#account_id"><code>account-id</code></a></a>, <a href="#basis_point"><a href="#basis_point"><code>basis-point</code></a></a>)&gt;</p>
+</li>
+<li>
+<p><a href="royalties.percent" name="royalties.percent"></a> <a href="#royalties.percent"><code>percent</code></a>: <a href="#basis_point"><a href="#basis_point"><code>basis-point</code></a></a></p>
+</li>
+</ul>
+<h1>Functions</h1>
+<hr />
+<h4><a href="#nft_transfer_payout" name="nft_transfer_payout"></a> <a href="#nft_transfer_payout"><code>nft-transfer-payout</code></a></h4>
+<h5>Params</h5>
+<ul>
+<li><a href="#nft_transfer_payout.args" name="nft_transfer_payout.args"></a> <code>args</code>: <a href="#nft_transfer_payout_args"><a href="#nft_transfer_payout_args"><code>nft-transfer-payout-args</code></a></a></li>
+</ul>
+<h5>Results</h5>
+<ul>
+<li><a href="#nft_transfer_payout." name="nft_transfer_payout."></a> ``: <a href="#payout"><a href="#payout"><code>payout</code></a></a></li>
+</ul>
+<hr />
+<h4><a href="#claim" name="claim"></a> <a href="#claim"><code>claim</code></a></h4>
+<h5>Params</h5>
+<ul>
+<li><a href="#claim.args" name="claim.args"></a> <code>args</code>: <a href="#claim_args"><a href="#claim_args"><code>claim-args</code></a></a></li>
+</ul>
+<h5>Results</h5>
+<ul>
+<li><a href="#claim." name="claim."></a> ``: <a href="#promise"><a href="#promise"><code>promise</code></a></a></li>
+</ul>
+<hr />
+<h4><a href="#get_linkdrop_contract" name="get_linkdrop_contract"></a> <a href="#get_linkdrop_contract"><code>get-linkdrop-contract</code></a></h4>
+<h5>Results</h5>
+<ul>
+<li><a href="#get_linkdrop_contract." name="get_linkdrop_contract."></a> ``: <a href="#account_id"><a href="#account_id"><code>account-id</code></a></a></li>
+</ul>
+<hr />
+<h4><a href="#cost_of_linkdrop" name="cost_of_linkdrop"></a> <a href="#cost_of_linkdrop"><code>cost-of-linkdrop</code></a></h4>
+<h5>Params</h5>
+<ul>
+<li><a href="#cost_of_linkdrop.args" name="cost_of_linkdrop.args"></a> <code>args</code>: <a href="#cost_of_linkdrop_args"><a href="#cost_of_linkdrop_args"><code>cost-of-linkdrop-args</code></a></a></li>
+</ul>
+<h5>Results</h5>
+<ul>
+<li><a href="#cost_of_linkdrop." name="cost_of_linkdrop."></a> ``: <a href="#u128"><a href="#u128"><code>u128</code></a></a></li>
+</ul>
+<hr />
+<h4><a href="#nft_approve" name="nft_approve"></a> <a href="#nft_approve"><code>nft-approve</code></a></h4>
+<h5>Params</h5>
+<ul>
+<li><a href="#nft_approve.args" name="nft_approve.args"></a> <code>args</code>: <a href="#nft_approve_args"><a href="#nft_approve_args"><code>nft-approve-args</code></a></a></li>
+</ul>
+<h5>Results</h5>
+<ul>
+<li><a href="#nft_approve." name="nft_approve."></a> ``: option&lt;<a href="#promise"><a href="#promise"><code>promise</code></a></a>&gt;</li>
+</ul>
+<hr />
+<h4><a href="#nft_mint_one" name="nft_mint_one"></a> <a href="#nft_mint_one"><code>nft-mint-one</code></a></h4>
+<h5>Results</h5>
+<ul>
+<li><a href="#nft_mint_one." name="nft_mint_one."></a> ``: <a href="#token"><a href="#token"><code>token</code></a></a></li>
+</ul>
+<hr />
+<h4><a href="#on_create_and_claim" name="on_create_and_claim"></a> <a href="#on_create_and_claim"><code>on-create-and-claim</code></a></h4>
+<h5>Params</h5>
+<ul>
+<li><a href="#on_create_and_claim.args" name="on_create_and_claim.args"></a> <code>args</code>: <a href="#on_create_and_claim_args"><a href="#on_create_and_claim_args"><code>on-create-and-claim-args</code></a></a></li>
+</ul>
+<hr />
+<h4><a href="#total_cost" name="total_cost"></a> <a href="#total_cost"><code>total-cost</code></a></h4>
+<h5>Params</h5>
+<ul>
+<li><a href="#total_cost.args" name="total_cost.args"></a> <code>args</code>: <a href="#total_cost_args"><a href="#total_cost_args"><code>total-cost-args</code></a></a></li>
+</ul>
+<h5>Results</h5>
+<ul>
+<li><a href="#total_cost." name="total_cost."></a> ``: <a href="#u128"><a href="#u128"><code>u128</code></a></a></li>
+</ul>
+<hr />
+<h4><a href="#nft_revoke" name="nft_revoke"></a> <a href="#nft_revoke"><code>nft-revoke</code></a></h4>
+<h5>Params</h5>
+<ul>
+<li><a href="#nft_revoke.args" name="nft_revoke.args"></a> <code>args</code>: <a href="#nft_revoke_args"><a href="#nft_revoke_args"><code>nft-revoke-args</code></a></a></li>
+</ul>
+<hr />
+<h4><a href="#add_whitelist_accounts" name="add_whitelist_accounts"></a> <a href="#add_whitelist_accounts"><code>add-whitelist-accounts</code></a></h4>
+<h5>Params</h5>
+<ul>
+<li><a href="#add_whitelist_accounts.args" name="add_whitelist_accounts.args"></a> <code>args</code>: <a href="#add_whitelist_accounts_args"><a href="#add_whitelist_accounts_args"><code>add-whitelist-accounts-args</code></a></a></li>
+</ul>
+<hr />
+<h4><a href="#tokens_left" name="tokens_left"></a> <a href="#tokens_left"><code>tokens-left</code></a></h4>
+<h5>Results</h5>
+<ul>
+<li><a href="#tokens_left." name="tokens_left."></a> ``: <code>u32</code></li>
+</ul>
+<hr />
+<h4><a href="#check_key" name="check_key"></a> <a href="#check_key"><code>check-key</code></a></h4>
+<h5>Params</h5>
+<ul>
+<li><a href="#check_key.args" name="check_key.args"></a> <code>args</code>: <a href="#check_key_args"><a href="#check_key_args"><code>check-key-args</code></a></a></li>
+</ul>
+<h5>Results</h5>
+<ul>
+<li><a href="#check_key." name="check_key."></a> ``: <code>bool</code></li>
+</ul>
+<hr />
+<h4><a href="#new_default_meta" name="new_default_meta"></a> <a href="#new_default_meta"><code>new-default-meta</code></a></h4>
+<h5>Params</h5>
+<ul>
+<li><a href="#new_default_meta.args" name="new_default_meta.args"></a> <code>args</code>: <a href="#new_default_meta_args"><a href="#new_default_meta_args"><code>new-default-meta-args</code></a></a></li>
+</ul>
+<hr />
+<h4><a href="#new" name="new"></a> <a href="#new"><code>new</code></a></h4>
+<h5>Params</h5>
+<ul>
+<li><a href="#new.args" name="new.args"></a> <code>args</code>: <a href="#new_args"><a href="#new_args"><code>new-args</code></a></a></li>
+</ul>
+<hr />
+<h4><a href="#nft_mint_many" name="nft_mint_many"></a> <a href="#nft_mint_many"><code>nft-mint-many</code></a></h4>
+<h5>Params</h5>
+<ul>
+<li><a href="#nft_mint_many.args" name="nft_mint_many.args"></a> <code>args</code>: <a href="#nft_mint_many_args"><a href="#nft_mint_many_args"><code>nft-mint-many-args</code></a></a></li>
+</ul>
+<h5>Results</h5>
+<ul>
+<li><a href="#nft_mint_many." name="nft_mint_many."></a> ``: list&lt;<a href="#token"><a href="#token"><code>token</code></a></a>&gt;</li>
+</ul>
+<hr />
+<h4><a href="#token_storage_cost" name="token_storage_cost"></a> <a href="#token_storage_cost"><code>token-storage-cost</code></a></h4>
+<h5>Results</h5>
+<ul>
+<li><a href="#token_storage_cost." name="token_storage_cost."></a> ``: <a href="#u128"><a href="#u128"><code>u128</code></a></a></li>
+</ul>
+<hr />
+<h4><a href="#whitelisted" name="whitelisted"></a> <a href="#whitelisted"><code>whitelisted</code></a></h4>
+<h5>Params</h5>
+<ul>
+<li><a href="#whitelisted.args" name="whitelisted.args"></a> <code>args</code>: <a href="#whitelisted_args"><a href="#whitelisted_args"><code>whitelisted-args</code></a></a></li>
+</ul>
+<h5>Results</h5>
+<ul>
+<li><a href="#whitelisted." name="whitelisted."></a> ``: <code>bool</code></li>
+</ul>
+<hr />
+<h4><a href="#create_linkdrop" name="create_linkdrop"></a> <a href="#create_linkdrop"><code>create-linkdrop</code></a></h4>
+<h5>Params</h5>
+<ul>
+<li><a href="#create_linkdrop.args" name="create_linkdrop.args"></a> <code>args</code>: <a href="#create_linkdrop_args"><a href="#create_linkdrop_args"><code>create-linkdrop-args</code></a></a></li>
+</ul>
+<h5>Results</h5>
+<ul>
+<li><a href="#create_linkdrop." name="create_linkdrop."></a> ``: <a href="#promise"><a href="#promise"><code>promise</code></a></a></li>
+</ul>
+<hr />
+<h4><a href="#nft_resolve_transfer" name="nft_resolve_transfer"></a> <a href="#nft_resolve_transfer"><code>nft-resolve-transfer</code></a></h4>
+<h5>Params</h5>
+<ul>
+<li><a href="#nft_resolve_transfer.args" name="nft_resolve_transfer.args"></a> <code>args</code>: <a href="#nft_resolve_transfer_args"><a href="#nft_resolve_transfer_args"><code>nft-resolve-transfer-args</code></a></a></li>
+</ul>
+<h5>Results</h5>
+<ul>
+<li><a href="#nft_resolve_transfer." name="nft_resolve_transfer."></a> ``: <code>bool</code></li>
+</ul>
+<hr />
+<h4><a href="#end_premint" name="end_premint"></a> <a href="#end_premint"><code>end-premint</code></a></h4>
+<h5>Params</h5>
+<ul>
+<li><a href="#end_premint.args" name="end_premint.args"></a> <code>args</code>: <a href="#end_premint_args"><a href="#end_premint_args"><code>end-premint-args</code></a></a></li>
+</ul>
+<hr />
+<h4><a href="#nft_token" name="nft_token"></a> <a href="#nft_token"><code>nft-token</code></a></h4>
+<h5>Params</h5>
+<ul>
+<li><a href="#nft_token.args" name="nft_token.args"></a> <code>args</code>: <a href="#nft_token_args"><a href="#nft_token_args"><code>nft-token-args</code></a></a></li>
+</ul>
+<h5>Results</h5>
+<ul>
+<li><a href="#nft_token." name="nft_token."></a> ``: option&lt;<a href="#token"><a href="#token"><code>token</code></a></a>&gt;</li>
+</ul>
+<hr />
+<h4><a href="#add_whitelist_account_ungaurded" name="add_whitelist_account_ungaurded"></a> <a href="#add_whitelist_account_ungaurded"><code>add-whitelist-account-ungaurded</code></a></h4>
+<h5>Params</h5>
+<ul>
+<li><a href="#add_whitelist_account_ungaurded.args" name="add_whitelist_account_ungaurded.args"></a> <code>args</code>: <a href="#add_whitelist_account_ungaurded_args"><a href="#add_whitelist_account_ungaurded_args"><code>add-whitelist-account-ungaurded-args</code></a></a></li>
+</ul>
+<hr />
+<h4><a href="#get_key_balance" name="get_key_balance"></a> <a href="#get_key_balance"><code>get-key-balance</code></a></h4>
+<h5>Results</h5>
+<ul>
+<li><a href="#get_key_balance." name="get_key_balance."></a> ``: <a href="#u128"><a href="#u128"><code>u128</code></a></a></li>
+</ul>
+<hr />
+<h4><a href="#start_premint" name="start_premint"></a> <a href="#start_premint"><code>start-premint</code></a></h4>
+<h5>Params</h5>
+<ul>
+<li><a href="#start_premint.args" name="start_premint.args"></a> <code>args</code>: <a href="#start_premint_args"><a href="#start_premint_args"><code>start-premint-args</code></a></a></li>
+</ul>
+<hr />
+<h4><a href="#remaining_allowance" name="remaining_allowance"></a> <a href="#remaining_allowance"><code>remaining-allowance</code></a></h4>
+<h5>Params</h5>
+<ul>
+<li><a href="#remaining_allowance.args" name="remaining_allowance.args"></a> <code>args</code>: <a href="#remaining_allowance_args"><a href="#remaining_allowance_args"><code>remaining-allowance-args</code></a></a></li>
+</ul>
+<h5>Results</h5>
+<ul>
+<li><a href="#remaining_allowance." name="remaining_allowance."></a> ``: <code>u32</code></li>
+</ul>
+<hr />
+<h4><a href="#on_send_with_callback" name="on_send_with_callback"></a> <a href="#on_send_with_callback"><code>on-send-with-callback</code></a></h4>
+<hr />
+<h4><a href="#create_account_and_claim" name="create_account_and_claim"></a> <a href="#create_account_and_claim"><code>create-account-and-claim</code></a></h4>
+<h5>Params</h5>
+<ul>
+<li><a href="#create_account_and_claim.args" name="create_account_and_claim.args"></a> <code>args</code>: <a href="#create_account_and_claim_args"><a href="#create_account_and_claim_args"><code>create-account-and-claim-args</code></a></a></li>
+</ul>
+<h5>Results</h5>
+<ul>
+<li><a href="#create_account_and_claim." name="create_account_and_claim."></a> ``: <a href="#promise"><a href="#promise"><code>promise</code></a></a></li>
+</ul>
+<hr />
+<h4><a href="#discount" name="discount"></a> <a href="#discount"><code>discount</code></a></h4>
+<h5>Params</h5>
+<ul>
+<li><a href="#discount.args" name="discount.args"></a> <code>args</code>: <a href="#discount_args"><a href="#discount_args"><code>discount-args</code></a></a></li>
+</ul>
+<h5>Results</h5>
+<ul>
+<li><a href="#discount." name="discount."></a> ``: <a href="#u128"><a href="#u128"><code>u128</code></a></a></li>
+</ul>
+<hr />
+<h4><a href="#link_callback" name="link_callback"></a> <a href="#link_callback"><code>link-callback</code></a></h4>
+<h5>Params</h5>
+<ul>
+<li><a href="#link_callback.args" name="link_callback.args"></a> <code>args</code>: <a href="#link_callback_args"><a href="#link_callback_args"><code>link-callback-args</code></a></a></li>
+</ul>
+<h5>Results</h5>
+<ul>
+<li><a href="#link_callback." name="link_callback."></a> ``: <a href="#token"><a href="#token"><code>token</code></a></a></li>
+</ul>
+<hr />
+<h4><a href="#cost_per_token" name="cost_per_token"></a> <a href="#cost_per_token"><code>cost-per-token</code></a></h4>
+<h5>Params</h5>
+<ul>
+<li><a href="#cost_per_token.args" name="cost_per_token.args"></a> <code>args</code>: <a href="#cost_per_token_args"><a href="#cost_per_token_args"><code>cost-per-token-args</code></a></a></li>
+</ul>
+<h5>Results</h5>
+<ul>
+<li><a href="#cost_per_token." name="cost_per_token."></a> ``: <a href="#u128"><a href="#u128"><code>u128</code></a></a></li>
+</ul>
+<hr />
+<h4><a href="#nft_payout" name="nft_payout"></a> <a href="#nft_payout"><code>nft-payout</code></a></h4>
+<h5>Params</h5>
+<ul>
+<li><a href="#nft_payout.args" name="nft_payout.args"></a> <code>args</code>: <a href="#nft_payout_args"><a href="#nft_payout_args"><code>nft-payout-args</code></a></a></li>
+</ul>
+<h5>Results</h5>
+<ul>
+<li><a href="#nft_payout." name="nft_payout."></a> ``: <a href="#payout"><a href="#payout"><code>payout</code></a></a></li>
+</ul>
+<hr />
+<h4><a href="#nft_mint" name="nft_mint"></a> <a href="#nft_mint"><code>nft-mint</code></a></h4>
+<h5>Params</h5>
+<ul>
+<li><a href="#nft_mint.args" name="nft_mint.args"></a> <code>args</code>: <a href="#nft_mint_args"><a href="#nft_mint_args"><code>nft-mint-args</code></a></a></li>
+</ul>
+<h5>Results</h5>
+<ul>
+<li><a href="#nft_mint." name="nft_mint."></a> ``: <a href="#token"><a href="#token"><code>token</code></a></a></li>
+</ul>
+<hr />
+<h4><a href="#nft_transfer" name="nft_transfer"></a> <a href="#nft_transfer"><code>nft-transfer</code></a></h4>
+<h5>Params</h5>
+<ul>
+<li><a href="#nft_transfer.args" name="nft_transfer.args"></a> <code>args</code>: <a href="#nft_transfer_args"><a href="#nft_transfer_args"><code>nft-transfer-args</code></a></a></li>
+</ul>
+<hr />
+<h4><a href="#update_royalties" name="update_royalties"></a> <a href="#update_royalties"><code>update-royalties</code></a></h4>
+<h5>Params</h5>
+<ul>
+<li><a href="#update_royalties.args" name="update_royalties.args"></a> <code>args</code>: <a href="#update_royalties_args"><a href="#update_royalties_args"><code>update-royalties-args</code></a></a></li>
+</ul>
+<h5>Results</h5>
+<ul>
+<li><a href="#update_royalties." name="update_royalties."></a> ``: option&lt;<a href="#royalties"><a href="#royalties"><code>royalties</code></a></a>&gt;</li>
+</ul>
+<hr />
+<h4><a href="#nft_metadata" name="nft_metadata"></a> <a href="#nft_metadata"><code>nft-metadata</code></a></h4>
+<h5>Results</h5>
+<ul>
+<li><a href="#nft_metadata." name="nft_metadata."></a> ``: <a href="#nft_contract_metadata"><a href="#nft_contract_metadata"><code>nft-contract-metadata</code></a></a></li>
+</ul>
+<hr />
+<h4><a href="#nft_revoke_all" name="nft_revoke_all"></a> <a href="#nft_revoke_all"><code>nft-revoke-all</code></a></h4>
+<h5>Params</h5>
+<ul>
+<li><a href="#nft_revoke_all.args" name="nft_revoke_all.args"></a> <code>args</code>: <a href="#nft_revoke_all_args"><a href="#nft_revoke_all_args"><code>nft-revoke-all-args</code></a></a></li>
+</ul>
+<hr />
+<h4><a href="#nft_is_approved" name="nft_is_approved"></a> <a href="#nft_is_approved"><code>nft-is-approved</code></a></h4>
+<h5>Params</h5>
+<ul>
+<li><a href="#nft_is_approved.args" name="nft_is_approved.args"></a> <code>args</code>: <a href="#nft_is_approved_args"><a href="#nft_is_approved_args"><code>nft-is-approved-args</code></a></a></li>
+</ul>
+<h5>Results</h5>
+<ul>
+<li><a href="#nft_is_approved." name="nft_is_approved."></a> ``: <code>bool</code></li>
+</ul>
+<hr />
+<h4><a href="#transfer_ownership" name="transfer_ownership"></a> <a href="#transfer_ownership"><code>transfer-ownership</code></a></h4>
+<h5>Params</h5>
+<ul>
+<li><a href="#transfer_ownership.args" name="transfer_ownership.args"></a> <code>args</code>: <a href="#transfer_ownership_args"><a href="#transfer_ownership_args"><code>transfer-ownership-args</code></a></a></li>
+</ul>
+<hr />
+<h4><a href="#update_allowance" name="update_allowance"></a> <a href="#update_allowance"><code>update-allowance</code></a></h4>
+<h5>Params</h5>
+<ul>
+<li><a href="#update_allowance.args" name="update_allowance.args"></a> <code>args</code>: <a href="#update_allowance_args"><a href="#update_allowance_args"><code>update-allowance-args</code></a></a></li>
+</ul>
