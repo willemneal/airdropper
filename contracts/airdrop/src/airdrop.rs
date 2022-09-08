@@ -60,21 +60,20 @@ impl Airdrop {
     where
         I: Iterator<Item = PossibleAccountId>,
     {
-        let valid_accounts = accounts.filter_map(|a| {
-            let res = a.parse::<AccountId>().ok();
-            if res.is_none() {
-                env::log_str(&format!("Invalid AccountId: {}", a));
-            }
-            res
-        }).collect::<HashSet<_>>(); // Remove duplicates
+        let valid_accounts = accounts
+            .filter_map(|a| {
+                let res = a.parse::<AccountId>().ok();
+                if res.is_none() {
+                    env::log_str(&format!("Invalid AccountId: {}", a));
+                }
+                res
+            })
+            .collect::<HashSet<_>>(); // Remove duplicates
         self.owners.extend(valid_accounts);
         let (owners, size) = (self.owners.len(), self.info.size as u64);
-        require!(
-            owners <= size,
-            "too many accounts"
-        );
+        require!(owners <= size, "too many accounts");
         if owners == size {
-          self.ready = true;
+            self.ready = true;
         }
     }
 

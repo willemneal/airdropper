@@ -39,4 +39,3 @@ impl Contract {
         env::log_str(&format!("{:#?}", res));
     }
 }
-}

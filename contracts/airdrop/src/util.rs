@@ -45,7 +45,5 @@ pub fn data_url_to_string(accounts: &str) -> String {
 }
 
 pub fn string_to_line_iter(accounts: &str) -> impl Iterator<Item = String> + '_ {
-    accounts
-        .split_whitespace()
-        .map(str::to_lowercase)
+    accounts.split_whitespace().map(str::to_lowercase)
 }

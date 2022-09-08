@@ -26,9 +26,9 @@ mod types;
 mod util;
 mod views;
 
-use standards::*;
 use airdrop::*;
 use payout::*;
+use standards::*;
 use types::*;
 use util::current_time_ms;
 
