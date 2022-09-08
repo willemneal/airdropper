@@ -1,11 +1,6 @@
+use crate::util::{data_url_to_string, string_to_line_iter};
 use crate::*;
-use data_url::DataUrl;
 use near_contract_standards::non_fungible_token::{events::NftMint, Token};
-
-#[witgen]
-/// A file with an account id on each line.
-/// @format data-url
-type AccountIdFile = String;
 
 #[near_bindgen]
 impl Contract {
@@ -47,16 +42,8 @@ impl Contract {
     /// @allow ["::admins", "::owner"]
     pub fn add_accounts(&mut self, accounts: AccountIdFile) {
         self.assert_owner_or_admin();
-        let url = DataUrl::process(&accounts).unwrap();
-        let accounts = url
-            .decode_to_vec()
-            .map(|(bytes, _)| unsafe { String::from_utf8_unchecked(bytes) })
-            .unwrap();
-        let accounts = accounts
-            .split("\n")
-            .map(|s| s.trim())
-            .filter(|s| *s != "")
-            .map(|s| s.to_lowercase());
+        let accounts = data_url_to_string(&accounts);
+        let accounts = string_to_line_iter(&accounts);
         self.airdrop
             .as_mut()
             .expect("No current airdrop")
@@ -66,7 +53,7 @@ impl Contract {
     /// Drop a set of NFTs in current campaign
     /// @allow ["::admins", "::owner"]
     pub fn drop_many(&mut self, num: u32) {
-        // self.assert_owner_or_admin();
+        self.assert_owner_or_admin();
         let airdrop = self.airdrop.as_mut().expect("No current airdrop");
         let tokens = airdrop
             .drop_many(num)
@@ -86,11 +73,19 @@ impl Contract {
         {
             NftMint {
                 owner_id: &owner_id,
-                token_ids: &vec![token_id.as_str()],
+                token_ids: &[token_id.as_str()],
                 memo: None,
             }
             .emit()
         }
         env::log_str(&format!("{} gas burned", env::used_gas().0));
+    }
+
+    /// Add a new admin. Careful who you add!
+    /// @allow ["::admins", "::owner"]
+    pub fn add_admin(&mut self, account_id: AccountId) -> bool {
+        self.assert_owner_or_admin();
+        self.admins.insert(&account_id);
+        true
     }
 }

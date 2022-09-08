@@ -19,6 +19,95 @@ import {
 } from './helper';
 
 /**
+* milliseconds elapsed since the UNIX epoch
+*/
+export type TimestampMs = u64;
+/**
+* Represents an airdrop currently being dropped
+*/
+export interface AirdropInfo {
+  /**
+  * How many NFTs are part of the drop
+  */
+  size: u32;
+  /**
+  * Title to include in each NFT
+  */
+  title: string;
+  /**
+  * Description of each NFT
+  */
+  desc: string;
+  /**
+  * Media link
+  */
+  media: string;
+  /**
+  * reference link,
+  */
+  reference?: string;
+}
+/**
+* Potentially valid account id
+* @minLength 2
+* @maxLength 64
+* @pattern ^(([a-z\d]+[-_])*[a-z\d]+\.)*([a-z\d]+[-_])*[a-z\d]+$
+*/
+export type PossibleAccountId = string;
+/**
+* @format data-url
+*/
+export type Accounts = PossibleAccountId[];
+/**
+* Copied from https://github.com/near/NEPs/blob/6170aba1c6f4cd4804e9ad442caeae9dc47e7d44/specs/Standards/NonFungibleToken/Payout.md#reference-level-explanation
+* A mapping of NEAR accounts to the amount each should be paid out, in
+* the event of a token-sale. The payout mapping MUST be shorter than the
+* maximum length specified by the financial contract obtaining this
+* payout data. Any mapping of length 10 or less MUST be accepted by
+* financial contracts, so 10 is a safe upper limit.
+* This currently deviates from the standard but is in the process of updating to use this type
+*/
+export interface Payout {
+  payout: Record<AccountId, U128>;
+}
+export type BasisPoint = u16;
+export interface Royalties {
+  accounts: Record<AccountId, BasisPoint>;
+  percent: BasisPoint;
+}
+export interface InitialMetadata {
+  /**
+  * required, ex. "Mosaics"
+  */
+  name: string;
+  symbol: string;
+  /**
+  * Centralized gateway known to have reliable access to decentralized storage assets referenced by `reference` or `media` URLs
+  */
+  base_uri?: string;
+  /**
+  * Data URL
+  */
+  icon?: string;
+  /**
+  * a version like "nft-1.0.0" the current default
+  */
+  spec?: string;
+  /**
+  * URL to a JSON file with more info
+  */
+  reference?: string;
+  /**
+  * Base64-encoded sha256 hash of JSON from reference field. Required if `reference` is included.
+  */
+  reference_hash?: Base64VecU8;
+}
+/**
+* A file with an account id on each line.
+* @format data-url
+*/
+export type AccountIdFile = string;
+/**
 * StorageUsage is used to count the amount of storage used by a contract.
 */
 export type StorageUsage = u64;
@@ -120,133 +209,209 @@ export interface StorageBalance {
   available: U128;
 }
 export type WrappedDuration = string;
-export interface Royalties {
-  accounts: Record<AccountId, BasisPoint>;
-  percent: BasisPoint;
-}
-/**
-* milliseconds elapsed since the UNIX epoch
-*/
-export type TimestampMs = u64;
-export interface InitialMetadata {
-  name: string;
-  symbol: string;
-  uri: string;
-  icon?: string;
-  spec?: string;
-  reference?: string;
-  reference_hash?: Base64VecU8;
-}
-export type BasisPoint = u16;
-/**
-* Copied from https://github.com/near/NEPs/blob/6170aba1c6f4cd4804e9ad442caeae9dc47e7d44/specs/Standards/NonFungibleToken/Payout.md#reference-level-explanation
-* A mapping of NEAR accounts to the amount each should be paid out, in
-* the event of a token-sale. The payout mapping MUST be shorter than the
-* maximum length specified by the financial contract obtaining this
-* payout data. Any mapping of length 10 or less MUST be accepted by
-* financial contracts, so 10 is a safe upper limit.
-* This currently deviates from the standard but is in the process of updating to use this type
-*/
-export interface Payout {
-  payout: Record<AccountId, U128>;
-}
 
 export class Contract {
   
   constructor(public account: Account, public readonly contractId: string){}
   
   /**
-  * Revoke all approved accounts for a specific token.
-  * 
-  * Requirements
-  * * Caller of the method must attach a deposit of 1 yoctoⓃ for security
-  * purposes
-  * * If contract requires >1yN deposit on `nft_approve`, contract
-  * MUST refund all associated storage deposit when owner revokes approvals
-  * * Contract MUST panic if called by someone other than token owner
-  * 
-  * Arguments:
-  * * `token_id`: the token with approvals to revoke
+  * @allow ["::admins", "::owner"]
   */
-  async nft_revoke_all(args: {
-    token_id: TokenId;
-  }, options?: ChangeMethodOptions): Promise<void> {
-    return providers.getTransactionLastResult(await this.nft_revoke_allRaw(args, options));
-  }
-  /**
-  * Revoke all approved accounts for a specific token.
-  * 
-  * Requirements
-  * * Caller of the method must attach a deposit of 1 yoctoⓃ for security
-  * purposes
-  * * If contract requires >1yN deposit on `nft_approve`, contract
-  * MUST refund all associated storage deposit when owner revokes approvals
-  * * Contract MUST panic if called by someone other than token owner
-  * 
-  * Arguments:
-  * * `token_id`: the token with approvals to revoke
-  */
-  nft_revoke_allRaw(args: {
-    token_id: TokenId;
-  }, options?: ChangeMethodOptions): Promise<providers.FinalExecutionOutcome> {
-    return this.account.functionCall({contractId: this.contractId, methodName: "nft_revoke_all", args, ...options});
-  }
-  /**
-  * Revoke all approved accounts for a specific token.
-  * 
-  * Requirements
-  * * Caller of the method must attach a deposit of 1 yoctoⓃ for security
-  * purposes
-  * * If contract requires >1yN deposit on `nft_approve`, contract
-  * MUST refund all associated storage deposit when owner revokes approvals
-  * * Contract MUST panic if called by someone other than token owner
-  * 
-  * Arguments:
-  * * `token_id`: the token with approvals to revoke
-  */
-  nft_revoke_allTx(args: {
-    token_id: TokenId;
-  }, options?: ChangeMethodOptions): transactions.Action {
-    return transactions.functionCall("nft_revoke_all", args, options?.gas ?? DEFAULT_FUNCTION_CALL_GAS, options?.attachedDeposit ?? new BN(0))
-  }
   async transfer_ownership(args: {
     new_owner: AccountId;
   }, options?: ChangeMethodOptions): Promise<void> {
     return providers.getTransactionLastResult(await this.transfer_ownershipRaw(args, options));
   }
+  /**
+  * @allow ["::admins", "::owner"]
+  */
   transfer_ownershipRaw(args: {
     new_owner: AccountId;
   }, options?: ChangeMethodOptions): Promise<providers.FinalExecutionOutcome> {
     return this.account.functionCall({contractId: this.contractId, methodName: "transfer_ownership", args, ...options});
   }
+  /**
+  * @allow ["::admins", "::owner"]
+  */
   transfer_ownershipTx(args: {
     new_owner: AccountId;
   }, options?: ChangeMethodOptions): transactions.Action {
     return transactions.functionCall("transfer_ownership", args, options?.gas ?? DEFAULT_FUNCTION_CALL_GAS, options?.attachedDeposit ?? new BN(0))
   }
-  async nft_mint(args: {
-    token_id: TokenId;
-    token_owner_id: AccountId;
-    title: string;
-  }, options?: ChangeMethodOptions): Promise<Token> {
-    return providers.getTransactionLastResult(await this.nft_mintRaw(args, options));
+  /**
+  * @allow ["::admins", "::owner"]
+  */
+  async update_uri(args: {
+    uri: string;
+  }, options?: ChangeMethodOptions): Promise<void> {
+    return providers.getTransactionLastResult(await this.update_uriRaw(args, options));
   }
-  nft_mintRaw(args: {
-    token_id: TokenId;
-    token_owner_id: AccountId;
-    title: string;
+  /**
+  * @allow ["::admins", "::owner"]
+  */
+  update_uriRaw(args: {
+    uri: string;
   }, options?: ChangeMethodOptions): Promise<providers.FinalExecutionOutcome> {
-    return this.account.functionCall({contractId: this.contractId, methodName: "nft_mint", args, ...options});
+    return this.account.functionCall({contractId: this.contractId, methodName: "update_uri", args, ...options});
   }
-  nft_mintTx(args: {
-    token_id: TokenId;
-    token_owner_id: AccountId;
-    title: string;
+  /**
+  * @allow ["::admins", "::owner"]
+  */
+  update_uriTx(args: {
+    uri: string;
   }, options?: ChangeMethodOptions): transactions.Action {
-    return transactions.functionCall("nft_mint", args, options?.gas ?? DEFAULT_FUNCTION_CALL_GAS, options?.attachedDeposit ?? new BN(0))
+    return transactions.functionCall("update_uri", args, options?.gas ?? DEFAULT_FUNCTION_CALL_GAS, options?.attachedDeposit ?? new BN(0))
   }
-  cost_per_token(args = {}, options?: ViewFunctionOptions): Promise<U128> {
-    return this.account.viewFunction(this.contractId, "cost_per_token", args, options);
+  /**
+  * Create a new airdrop campaign. Can only have one active at a time.
+  * Will fail if current airdrop campaign
+  * @allow ["::admins", "::owner"]
+  */
+  async create_airdrop(args: {
+    airdrop: AirdropInfo;
+  }, options?: ChangeMethodOptions): Promise<void> {
+    return providers.getTransactionLastResult(await this.create_airdropRaw(args, options));
+  }
+  /**
+  * Create a new airdrop campaign. Can only have one active at a time.
+  * Will fail if current airdrop campaign
+  * @allow ["::admins", "::owner"]
+  */
+  create_airdropRaw(args: {
+    airdrop: AirdropInfo;
+  }, options?: ChangeMethodOptions): Promise<providers.FinalExecutionOutcome> {
+    return this.account.functionCall({contractId: this.contractId, methodName: "create_airdrop", args, ...options});
+  }
+  /**
+  * Create a new airdrop campaign. Can only have one active at a time.
+  * Will fail if current airdrop campaign
+  * @allow ["::admins", "::owner"]
+  */
+  create_airdropTx(args: {
+    airdrop: AirdropInfo;
+  }, options?: ChangeMethodOptions): transactions.Action {
+    return transactions.functionCall("create_airdrop", args, options?.gas ?? DEFAULT_FUNCTION_CALL_GAS, options?.attachedDeposit ?? new BN(0))
+  }
+  /**
+  * Add accounts that will be dropped to. An account
+  * can only be added once.
+  * @allow ["::admins", "::owner"]
+  */
+  async add_accounts(args: {
+    accounts: AccountIdFile;
+  }, options?: ChangeMethodOptions): Promise<void> {
+    return providers.getTransactionLastResult(await this.add_accountsRaw(args, options));
+  }
+  /**
+  * Add accounts that will be dropped to. An account
+  * can only be added once.
+  * @allow ["::admins", "::owner"]
+  */
+  add_accountsRaw(args: {
+    accounts: AccountIdFile;
+  }, options?: ChangeMethodOptions): Promise<providers.FinalExecutionOutcome> {
+    return this.account.functionCall({contractId: this.contractId, methodName: "add_accounts", args, ...options});
+  }
+  /**
+  * Add accounts that will be dropped to. An account
+  * can only be added once.
+  * @allow ["::admins", "::owner"]
+  */
+  add_accountsTx(args: {
+    accounts: AccountIdFile;
+  }, options?: ChangeMethodOptions): transactions.Action {
+    return transactions.functionCall("add_accounts", args, options?.gas ?? DEFAULT_FUNCTION_CALL_GAS, options?.attachedDeposit ?? new BN(0))
+  }
+  /**
+  * Drop a set of NFTs in current campaign
+  * @allow ["::admins", "::owner"]
+  */
+  async drop_many(args: {
+    num: u32;
+  }, options?: ChangeMethodOptions): Promise<void> {
+    return providers.getTransactionLastResult(await this.drop_manyRaw(args, options));
+  }
+  /**
+  * Drop a set of NFTs in current campaign
+  * @allow ["::admins", "::owner"]
+  */
+  drop_manyRaw(args: {
+    num: u32;
+  }, options?: ChangeMethodOptions): Promise<providers.FinalExecutionOutcome> {
+    return this.account.functionCall({contractId: this.contractId, methodName: "drop_many", args, ...options});
+  }
+  /**
+  * Drop a set of NFTs in current campaign
+  * @allow ["::admins", "::owner"]
+  */
+  drop_manyTx(args: {
+    num: u32;
+  }, options?: ChangeMethodOptions): transactions.Action {
+    return transactions.functionCall("drop_many", args, options?.gas ?? DEFAULT_FUNCTION_CALL_GAS, options?.attachedDeposit ?? new BN(0))
+  }
+  /**
+  * Add a new admin. Careful who you add!
+  * @allow ["::admins", "::owner"]
+  */
+  async add_admin(args: {
+    account_id: AccountId;
+  }, options?: ChangeMethodOptions): Promise<boolean> {
+    return providers.getTransactionLastResult(await this.add_adminRaw(args, options));
+  }
+  /**
+  * Add a new admin. Careful who you add!
+  * @allow ["::admins", "::owner"]
+  */
+  add_adminRaw(args: {
+    account_id: AccountId;
+  }, options?: ChangeMethodOptions): Promise<providers.FinalExecutionOutcome> {
+    return this.account.functionCall({contractId: this.contractId, methodName: "add_admin", args, ...options});
+  }
+  /**
+  * Add a new admin. Careful who you add!
+  * @allow ["::admins", "::owner"]
+  */
+  add_adminTx(args: {
+    account_id: AccountId;
+  }, options?: ChangeMethodOptions): transactions.Action {
+    return transactions.functionCall("add_admin", args, options?.gas ?? DEFAULT_FUNCTION_CALL_GAS, options?.attachedDeposit ?? new BN(0))
+  }
+  nft_payout(args: {
+    token_id: string;
+    balance: U128;
+    max_len_payout?: u32;
+  }, options?: ViewFunctionOptions): Promise<Payout> {
+    return this.account.viewFunction(this.contractId, "nft_payout", args, options);
+  }
+  async nft_transfer_payout(args: {
+    receiver_id: AccountId;
+    token_id: string;
+    approval_id?: u64;
+    memo?: string;
+    balance: U128;
+    max_len_payout?: u32;
+  }, options?: ChangeMethodOptions): Promise<Payout> {
+    return providers.getTransactionLastResult(await this.nft_transfer_payoutRaw(args, options));
+  }
+  nft_transfer_payoutRaw(args: {
+    receiver_id: AccountId;
+    token_id: string;
+    approval_id?: u64;
+    memo?: string;
+    balance: U128;
+    max_len_payout?: u32;
+  }, options?: ChangeMethodOptions): Promise<providers.FinalExecutionOutcome> {
+    return this.account.functionCall({contractId: this.contractId, methodName: "nft_transfer_payout", args, ...options});
+  }
+  nft_transfer_payoutTx(args: {
+    receiver_id: AccountId;
+    token_id: string;
+    approval_id?: u64;
+    memo?: string;
+    balance: U128;
+    max_len_payout?: u32;
+  }, options?: ChangeMethodOptions): transactions.Action {
+    return transactions.functionCall("nft_transfer_payout", args, options?.gas ?? DEFAULT_FUNCTION_CALL_GAS, options?.attachedDeposit ?? new BN(0))
   }
   /**
   * Simple transfer. Transfer a given `token_id` from current owner to
@@ -343,65 +508,6 @@ export class Contract {
     memo?: string;
   }, options?: ChangeMethodOptions): transactions.Action {
     return transactions.functionCall("nft_transfer", args, options?.gas ?? DEFAULT_FUNCTION_CALL_GAS, options?.attachedDeposit ?? new BN(0))
-  }
-  /**
-  * Check if a token is approved for transfer by a given account, optionally
-  * checking an approval_id
-  * 
-  * Arguments:
-  * * `token_id`: the token for which to revoke an approval
-  * * `approved_account_id`: the account to check the existence of in `approvals`
-  * * `approval_id`: an optional approval ID to check against current approval ID for given account
-  * 
-  * Returns:
-  * if `approval_id` given, `true` if `approved_account_id` is approved with given `approval_id`
-  * otherwise, `true` if `approved_account_id` is in list of approved accounts
-  */
-  nft_is_approved(args: {
-    token_id: TokenId;
-    approved_account_id: AccountId;
-    approval_id?: u64;
-  }, options?: ViewFunctionOptions): Promise<boolean> {
-    return this.account.viewFunction(this.contractId, "nft_is_approved", args, options);
-  }
-  async update_uri(args: {
-    uri: string;
-  }, options?: ChangeMethodOptions): Promise<void> {
-    return providers.getTransactionLastResult(await this.update_uriRaw(args, options));
-  }
-  update_uriRaw(args: {
-    uri: string;
-  }, options?: ChangeMethodOptions): Promise<providers.FinalExecutionOutcome> {
-    return this.account.functionCall({contractId: this.contractId, methodName: "update_uri", args, ...options});
-  }
-  update_uriTx(args: {
-    uri: string;
-  }, options?: ChangeMethodOptions): transactions.Action {
-    return transactions.functionCall("update_uri", args, options?.gas ?? DEFAULT_FUNCTION_CALL_GAS, options?.attachedDeposit ?? new BN(0))
-  }
-  nft_payout(args: {
-    token_id: string;
-    balance: U128;
-    max_len_payout?: u32;
-  }, options?: ViewFunctionOptions): Promise<Payout> {
-    return this.account.viewFunction(this.contractId, "nft_payout", args, options);
-  }
-  /**
-  * Get a list of all tokens
-  * 
-  * Arguments:
-  * * `from_index`: a string representing an unsigned 128-bit integer,
-  * representing the starting index of tokens to return. (default 0)
-  * * `limit`: the maximum number of tokens to return (default total supply)
-  * Could fail on gas
-  * 
-  * Returns an array of Token objects, as described in Core standard
-  */
-  nft_tokens(args: {
-    from_index?: U128;
-    limit?: u64;
-  }, options?: ViewFunctionOptions): Promise<Token[]> {
-    return this.account.viewFunction(this.contractId, "nft_tokens", args, options);
   }
   /**
   * Transfer token and call a method on a receiver contract. A successful
@@ -535,122 +641,6 @@ export class Contract {
   }, options?: ChangeMethodOptions): transactions.Action {
     return transactions.functionCall("nft_transfer_call", args, options?.gas ?? DEFAULT_FUNCTION_CALL_GAS, options?.attachedDeposit ?? new BN(0))
   }
-  total_cost(args: {
-    num: u32;
-  }, options?: ViewFunctionOptions): Promise<U128> {
-    return this.account.viewFunction(this.contractId, "total_cost", args, options);
-  }
-  async nft_transfer_payout(args: {
-    receiver_id: AccountId;
-    token_id: string;
-    approval_id?: u64;
-    memo?: string;
-    balance: U128;
-    max_len_payout?: u32;
-  }, options?: ChangeMethodOptions): Promise<Payout> {
-    return providers.getTransactionLastResult(await this.nft_transfer_payoutRaw(args, options));
-  }
-  nft_transfer_payoutRaw(args: {
-    receiver_id: AccountId;
-    token_id: string;
-    approval_id?: u64;
-    memo?: string;
-    balance: U128;
-    max_len_payout?: u32;
-  }, options?: ChangeMethodOptions): Promise<providers.FinalExecutionOutcome> {
-    return this.account.functionCall({contractId: this.contractId, methodName: "nft_transfer_payout", args, ...options});
-  }
-  nft_transfer_payoutTx(args: {
-    receiver_id: AccountId;
-    token_id: string;
-    approval_id?: u64;
-    memo?: string;
-    balance: U128;
-    max_len_payout?: u32;
-  }, options?: ChangeMethodOptions): transactions.Action {
-    return transactions.functionCall("nft_transfer_payout", args, options?.gas ?? DEFAULT_FUNCTION_CALL_GAS, options?.attachedDeposit ?? new BN(0))
-  }
-  /**
-  * Revoke an approved account for a specific token.
-  * 
-  * Requirements
-  * * Caller of the method must attach a deposit of 1 yoctoⓃ for security
-  * purposes
-  * * If contract requires >1yN deposit on `nft_approve`, contract
-  * MUST refund associated storage deposit when owner revokes approval
-  * * Contract MUST panic if called by someone other than token owner
-  * 
-  * Arguments:
-  * * `token_id`: the token for which to revoke an approval
-  * * `account_id`: the account to remove from `approvals`
-  */
-  async nft_revoke(args: {
-    token_id: TokenId;
-    account_id: AccountId;
-  }, options?: ChangeMethodOptions): Promise<void> {
-    return providers.getTransactionLastResult(await this.nft_revokeRaw(args, options));
-  }
-  /**
-  * Revoke an approved account for a specific token.
-  * 
-  * Requirements
-  * * Caller of the method must attach a deposit of 1 yoctoⓃ for security
-  * purposes
-  * * If contract requires >1yN deposit on `nft_approve`, contract
-  * MUST refund associated storage deposit when owner revokes approval
-  * * Contract MUST panic if called by someone other than token owner
-  * 
-  * Arguments:
-  * * `token_id`: the token for which to revoke an approval
-  * * `account_id`: the account to remove from `approvals`
-  */
-  nft_revokeRaw(args: {
-    token_id: TokenId;
-    account_id: AccountId;
-  }, options?: ChangeMethodOptions): Promise<providers.FinalExecutionOutcome> {
-    return this.account.functionCall({contractId: this.contractId, methodName: "nft_revoke", args, ...options});
-  }
-  /**
-  * Revoke an approved account for a specific token.
-  * 
-  * Requirements
-  * * Caller of the method must attach a deposit of 1 yoctoⓃ for security
-  * purposes
-  * * If contract requires >1yN deposit on `nft_approve`, contract
-  * MUST refund associated storage deposit when owner revokes approval
-  * * Contract MUST panic if called by someone other than token owner
-  * 
-  * Arguments:
-  * * `token_id`: the token for which to revoke an approval
-  * * `account_id`: the account to remove from `approvals`
-  */
-  nft_revokeTx(args: {
-    token_id: TokenId;
-    account_id: AccountId;
-  }, options?: ChangeMethodOptions): transactions.Action {
-    return transactions.functionCall("nft_revoke", args, options?.gas ?? DEFAULT_FUNCTION_CALL_GAS, options?.attachedDeposit ?? new BN(0))
-  }
-  async new(args: {
-    owner_id: AccountId;
-    metadata: NftContractMetadata;
-    size: u32;
-  }, options?: ChangeMethodOptions): Promise<void> {
-    return providers.getTransactionLastResult(await this.newRaw(args, options));
-  }
-  newRaw(args: {
-    owner_id: AccountId;
-    metadata: NftContractMetadata;
-    size: u32;
-  }, options?: ChangeMethodOptions): Promise<providers.FinalExecutionOutcome> {
-    return this.account.functionCall({contractId: this.contractId, methodName: "new", args, ...options});
-  }
-  newTx(args: {
-    owner_id: AccountId;
-    metadata: NftContractMetadata;
-    size: u32;
-  }, options?: ChangeMethodOptions): transactions.Action {
-    return transactions.functionCall("new", args, options?.gas ?? DEFAULT_FUNCTION_CALL_GAS, options?.attachedDeposit ?? new BN(0))
-  }
   /**
   * Returns the token with the given `token_id` or `null` if no such token.
   */
@@ -658,16 +648,6 @@ export class Contract {
     token_id: TokenId;
   }, options?: ViewFunctionOptions): Promise<Token | null> {
     return this.account.viewFunction(this.contractId, "nft_token", args, options);
-  }
-  /**
-  * Returns the total supply of non-fungible tokens as a string representing an
-  * unsigned 128-bit integer to avoid JSON number limit of 2^53.
-  */
-  nft_total_supply(args = {}, options?: ViewFunctionOptions): Promise<U128> {
-    return this.account.viewFunction(this.contractId, "nft_total_supply", args, options);
-  }
-  token_storage_cost(args = {}, options?: ViewFunctionOptions): Promise<U128> {
-    return this.account.viewFunction(this.contractId, "token_storage_cost", args, options);
   }
   /**
   * Add an approved account for a specific token.
@@ -763,6 +743,164 @@ export class Contract {
     return transactions.functionCall("nft_approve", args, options?.gas ?? DEFAULT_FUNCTION_CALL_GAS, options?.attachedDeposit ?? new BN(0))
   }
   /**
+  * Revoke an approved account for a specific token.
+  * 
+  * Requirements
+  * * Caller of the method must attach a deposit of 1 yoctoⓃ for security
+  * purposes
+  * * If contract requires >1yN deposit on `nft_approve`, contract
+  * MUST refund associated storage deposit when owner revokes approval
+  * * Contract MUST panic if called by someone other than token owner
+  * 
+  * Arguments:
+  * * `token_id`: the token for which to revoke an approval
+  * * `account_id`: the account to remove from `approvals`
+  */
+  async nft_revoke(args: {
+    token_id: TokenId;
+    account_id: AccountId;
+  }, options?: ChangeMethodOptions): Promise<void> {
+    return providers.getTransactionLastResult(await this.nft_revokeRaw(args, options));
+  }
+  /**
+  * Revoke an approved account for a specific token.
+  * 
+  * Requirements
+  * * Caller of the method must attach a deposit of 1 yoctoⓃ for security
+  * purposes
+  * * If contract requires >1yN deposit on `nft_approve`, contract
+  * MUST refund associated storage deposit when owner revokes approval
+  * * Contract MUST panic if called by someone other than token owner
+  * 
+  * Arguments:
+  * * `token_id`: the token for which to revoke an approval
+  * * `account_id`: the account to remove from `approvals`
+  */
+  nft_revokeRaw(args: {
+    token_id: TokenId;
+    account_id: AccountId;
+  }, options?: ChangeMethodOptions): Promise<providers.FinalExecutionOutcome> {
+    return this.account.functionCall({contractId: this.contractId, methodName: "nft_revoke", args, ...options});
+  }
+  /**
+  * Revoke an approved account for a specific token.
+  * 
+  * Requirements
+  * * Caller of the method must attach a deposit of 1 yoctoⓃ for security
+  * purposes
+  * * If contract requires >1yN deposit on `nft_approve`, contract
+  * MUST refund associated storage deposit when owner revokes approval
+  * * Contract MUST panic if called by someone other than token owner
+  * 
+  * Arguments:
+  * * `token_id`: the token for which to revoke an approval
+  * * `account_id`: the account to remove from `approvals`
+  */
+  nft_revokeTx(args: {
+    token_id: TokenId;
+    account_id: AccountId;
+  }, options?: ChangeMethodOptions): transactions.Action {
+    return transactions.functionCall("nft_revoke", args, options?.gas ?? DEFAULT_FUNCTION_CALL_GAS, options?.attachedDeposit ?? new BN(0))
+  }
+  /**
+  * Revoke all approved accounts for a specific token.
+  * 
+  * Requirements
+  * * Caller of the method must attach a deposit of 1 yoctoⓃ for security
+  * purposes
+  * * If contract requires >1yN deposit on `nft_approve`, contract
+  * MUST refund all associated storage deposit when owner revokes approvals
+  * * Contract MUST panic if called by someone other than token owner
+  * 
+  * Arguments:
+  * * `token_id`: the token with approvals to revoke
+  */
+  async nft_revoke_all(args: {
+    token_id: TokenId;
+  }, options?: ChangeMethodOptions): Promise<void> {
+    return providers.getTransactionLastResult(await this.nft_revoke_allRaw(args, options));
+  }
+  /**
+  * Revoke all approved accounts for a specific token.
+  * 
+  * Requirements
+  * * Caller of the method must attach a deposit of 1 yoctoⓃ for security
+  * purposes
+  * * If contract requires >1yN deposit on `nft_approve`, contract
+  * MUST refund all associated storage deposit when owner revokes approvals
+  * * Contract MUST panic if called by someone other than token owner
+  * 
+  * Arguments:
+  * * `token_id`: the token with approvals to revoke
+  */
+  nft_revoke_allRaw(args: {
+    token_id: TokenId;
+  }, options?: ChangeMethodOptions): Promise<providers.FinalExecutionOutcome> {
+    return this.account.functionCall({contractId: this.contractId, methodName: "nft_revoke_all", args, ...options});
+  }
+  /**
+  * Revoke all approved accounts for a specific token.
+  * 
+  * Requirements
+  * * Caller of the method must attach a deposit of 1 yoctoⓃ for security
+  * purposes
+  * * If contract requires >1yN deposit on `nft_approve`, contract
+  * MUST refund all associated storage deposit when owner revokes approvals
+  * * Contract MUST panic if called by someone other than token owner
+  * 
+  * Arguments:
+  * * `token_id`: the token with approvals to revoke
+  */
+  nft_revoke_allTx(args: {
+    token_id: TokenId;
+  }, options?: ChangeMethodOptions): transactions.Action {
+    return transactions.functionCall("nft_revoke_all", args, options?.gas ?? DEFAULT_FUNCTION_CALL_GAS, options?.attachedDeposit ?? new BN(0))
+  }
+  /**
+  * Check if a token is approved for transfer by a given account, optionally
+  * checking an approval_id
+  * 
+  * Arguments:
+  * * `token_id`: the token for which to revoke an approval
+  * * `approved_account_id`: the account to check the existence of in `approvals`
+  * * `approval_id`: an optional approval ID to check against current approval ID for given account
+  * 
+  * Returns:
+  * if `approval_id` given, `true` if `approved_account_id` is approved with given `approval_id`
+  * otherwise, `true` if `approved_account_id` is in list of approved accounts
+  */
+  nft_is_approved(args: {
+    token_id: TokenId;
+    approved_account_id: AccountId;
+    approval_id?: u64;
+  }, options?: ViewFunctionOptions): Promise<boolean> {
+    return this.account.viewFunction(this.contractId, "nft_is_approved", args, options);
+  }
+  /**
+  * Returns the total supply of non-fungible tokens as a string representing an
+  * unsigned 128-bit integer to avoid JSON number limit of 2^53.
+  */
+  nft_total_supply(args = {}, options?: ViewFunctionOptions): Promise<U128> {
+    return this.account.viewFunction(this.contractId, "nft_total_supply", args, options);
+  }
+  /**
+  * Get a list of all tokens
+  * 
+  * Arguments:
+  * * `from_index`: a string representing an unsigned 128-bit integer,
+  * representing the starting index of tokens to return. (default 0)
+  * * `limit`: the maximum number of tokens to return (default total supply)
+  * Could fail on gas
+  * 
+  * Returns an array of Token objects, as described in Core standard
+  */
+  nft_tokens(args: {
+    from_index?: U128;
+    limit?: u64;
+  }, options?: ViewFunctionOptions): Promise<Token[]> {
+    return this.account.viewFunction(this.contractId, "nft_tokens", args, options);
+  }
+  /**
   * Get number of tokens owned by a given account
   * 
   * Arguments:
@@ -776,30 +914,6 @@ export class Contract {
     account_id: AccountId;
   }, options?: ViewFunctionOptions): Promise<U128> {
     return this.account.viewFunction(this.contractId, "nft_supply_for_owner", args, options);
-  }
-  nft_metadata(args = {}, options?: ViewFunctionOptions): Promise<NftContractMetadata> {
-    return this.account.viewFunction(this.contractId, "nft_metadata", args, options);
-  }
-  async new_default_meta(args: {
-    owner_id: AccountId;
-    metadata: InitialMetadata;
-    size: u32;
-  }, options?: ChangeMethodOptions): Promise<void> {
-    return providers.getTransactionLastResult(await this.new_default_metaRaw(args, options));
-  }
-  new_default_metaRaw(args: {
-    owner_id: AccountId;
-    metadata: InitialMetadata;
-    size: u32;
-  }, options?: ChangeMethodOptions): Promise<providers.FinalExecutionOutcome> {
-    return this.account.functionCall({contractId: this.contractId, methodName: "new_default_meta", args, ...options});
-  }
-  new_default_metaTx(args: {
-    owner_id: AccountId;
-    metadata: InitialMetadata;
-    size: u32;
-  }, options?: ChangeMethodOptions): transactions.Action {
-    return transactions.functionCall("new_default_meta", args, options?.gas ?? DEFAULT_FUNCTION_CALL_GAS, options?.attachedDeposit ?? new BN(0))
   }
   /**
   * Get list of all tokens owned by a given account
@@ -820,59 +934,92 @@ export class Contract {
   }, options?: ViewFunctionOptions): Promise<Token[]> {
     return this.account.viewFunction(this.contractId, "nft_tokens_for_owner", args, options);
   }
-  async nft_mint_many(args: {
-    token_owners: AccountId[];
-    max: u32;
+  total_cost(args: {
+    num: u32;
+  }, options?: ViewFunctionOptions): Promise<U128> {
+    return this.account.viewFunction(this.contractId, "total_cost", args, options);
+  }
+  cost_per_token(args = {}, options?: ViewFunctionOptions): Promise<U128> {
+    return this.account.viewFunction(this.contractId, "cost_per_token", args, options);
+  }
+  token_storage_cost(args = {}, options?: ViewFunctionOptions): Promise<U128> {
+    return this.account.viewFunction(this.contractId, "token_storage_cost", args, options);
+  }
+  nft_metadata(args = {}, options?: ViewFunctionOptions): Promise<NftContractMetadata> {
+    return this.account.viewFunction(this.contractId, "nft_metadata", args, options);
+  }
+  current_status(args = {}, options?: ViewFunctionOptions): Promise<string> {
+    return this.account.viewFunction(this.contractId, "current_status", args, options);
+  }
+  async add_accounts_test(args: {
+    accounts: AccountIdFile;
   }, options?: ChangeMethodOptions): Promise<void> {
-    return providers.getTransactionLastResult(await this.nft_mint_manyRaw(args, options));
+    return providers.getTransactionLastResult(await this.add_accounts_testRaw(args, options));
   }
-  nft_mint_manyRaw(args: {
-    token_owners: AccountId[];
-    max: u32;
+  add_accounts_testRaw(args: {
+    accounts: AccountIdFile;
   }, options?: ChangeMethodOptions): Promise<providers.FinalExecutionOutcome> {
-    return this.account.functionCall({contractId: this.contractId, methodName: "nft_mint_many", args, ...options});
+    return this.account.functionCall({contractId: this.contractId, methodName: "add_accounts_test", args, ...options});
   }
-  nft_mint_manyTx(args: {
-    token_owners: AccountId[];
-    max: u32;
+  add_accounts_testTx(args: {
+    accounts: AccountIdFile;
   }, options?: ChangeMethodOptions): transactions.Action {
-    return transactions.functionCall("nft_mint_many", args, options?.gas ?? DEFAULT_FUNCTION_CALL_GAS, options?.attachedDeposit ?? new BN(0))
+    return transactions.functionCall("add_accounts_test", args, options?.gas ?? DEFAULT_FUNCTION_CALL_GAS, options?.attachedDeposit ?? new BN(0))
+  }
+  /**
+  * Create a new airdrop contract
+  */
+  async new_default(args: {
+    owner_id: AccountId;
+    metadata: InitialMetadata;
+    royalties?: Royalties;
+  }, options?: ChangeMethodOptions): Promise<void> {
+    return providers.getTransactionLastResult(await this.new_defaultRaw(args, options));
+  }
+  /**
+  * Create a new airdrop contract
+  */
+  new_defaultRaw(args: {
+    owner_id: AccountId;
+    metadata: InitialMetadata;
+    royalties?: Royalties;
+  }, options?: ChangeMethodOptions): Promise<providers.FinalExecutionOutcome> {
+    return this.account.functionCall({contractId: this.contractId, methodName: "new_default", args, ...options});
+  }
+  /**
+  * Create a new airdrop contract
+  */
+  new_defaultTx(args: {
+    owner_id: AccountId;
+    metadata: InitialMetadata;
+    royalties?: Royalties;
+  }, options?: ChangeMethodOptions): transactions.Action {
+    return transactions.functionCall("new_default", args, options?.gas ?? DEFAULT_FUNCTION_CALL_GAS, options?.attachedDeposit ?? new BN(0))
+  }
+  async new(args: {
+    owner_id: AccountId;
+    metadata: NftContractMetadata;
+    royalties?: Royalties;
+  }, options?: ChangeMethodOptions): Promise<void> {
+    return providers.getTransactionLastResult(await this.newRaw(args, options));
+  }
+  newRaw(args: {
+    owner_id: AccountId;
+    metadata: NftContractMetadata;
+    royalties?: Royalties;
+  }, options?: ChangeMethodOptions): Promise<providers.FinalExecutionOutcome> {
+    return this.account.functionCall({contractId: this.contractId, methodName: "new", args, ...options});
+  }
+  newTx(args: {
+    owner_id: AccountId;
+    metadata: NftContractMetadata;
+    royalties?: Royalties;
+  }, options?: ChangeMethodOptions): transactions.Action {
+    return transactions.functionCall("new", args, options?.gas ?? DEFAULT_FUNCTION_CALL_GAS, options?.attachedDeposit ?? new BN(0))
   }
 }
 /**
-* Revoke all approved accounts for a specific token.
-* 
-* Requirements
-* * Caller of the method must attach a deposit of 1 yoctoⓃ for security
-* purposes
-* * If contract requires >1yN deposit on `nft_approve`, contract
-* MUST refund all associated storage deposit when owner revokes approvals
-* * Contract MUST panic if called by someone other than token owner
-* 
-* Arguments:
-* * `token_id`: the token with approvals to revoke
-* 
-* @contractMethod change
-*/
-export interface NftRevokeAll {
-  args: {
-    token_id: TokenId;
-  };
-  options: {
-    /** Units in gas
-    * @pattern [0-9]+
-    * @default "30000000000000"
-    */
-    gas?: string;
-    /** Units in yoctoNear
-    * @default "0"
-    */
-    attachedDeposit?: Balance;
-  }
-  
-}
-export type NftRevokeAll__Result = void;
-/**
+* @allow ["::admins", "::owner"]
 * 
 * @contractMethod change
 */
@@ -895,14 +1042,13 @@ export interface TransferOwnership {
 }
 export type TransferOwnership__Result = void;
 /**
+* @allow ["::admins", "::owner"]
 * 
 * @contractMethod change
 */
-export interface NftMint {
+export interface UpdateUri {
   args: {
-    token_id: TokenId;
-    token_owner_id: AccountId;
-    title: string;
+    uri: string;
   };
   options: {
     /** Units in gas
@@ -917,16 +1063,145 @@ export interface NftMint {
   }
   
 }
-export type NftMint__Result = Token;
+export type UpdateUri__Result = void;
+/**
+* Create a new airdrop campaign. Can only have one active at a time.
+* Will fail if current airdrop campaign
+* @allow ["::admins", "::owner"]
+* 
+* @contractMethod change
+*/
+export interface CreateAirdrop {
+  args: {
+    airdrop: AirdropInfo;
+  };
+  options: {
+    /** Units in gas
+    * @pattern [0-9]+
+    * @default "30000000000000"
+    */
+    gas?: string;
+    /** Units in yoctoNear
+    * @default "0"
+    */
+    attachedDeposit?: Balance;
+  }
+  
+}
+export type CreateAirdrop__Result = void;
+/**
+* Add accounts that will be dropped to. An account
+* can only be added once.
+* @allow ["::admins", "::owner"]
+* 
+* @contractMethod change
+*/
+export interface AddAccounts {
+  args: {
+    accounts: AccountIdFile;
+  };
+  options: {
+    /** Units in gas
+    * @pattern [0-9]+
+    * @default "30000000000000"
+    */
+    gas?: string;
+    /** Units in yoctoNear
+    * @default "0"
+    */
+    attachedDeposit?: Balance;
+  }
+  
+}
+export type AddAccounts__Result = void;
+/**
+* Drop a set of NFTs in current campaign
+* @allow ["::admins", "::owner"]
+* 
+* @contractMethod change
+*/
+export interface DropMany {
+  args: {
+    num: u32;
+  };
+  options: {
+    /** Units in gas
+    * @pattern [0-9]+
+    * @default "30000000000000"
+    */
+    gas?: string;
+    /** Units in yoctoNear
+    * @default "0"
+    */
+    attachedDeposit?: Balance;
+  }
+  
+}
+export type DropMany__Result = void;
+/**
+* Add a new admin. Careful who you add!
+* @allow ["::admins", "::owner"]
+* 
+* @contractMethod change
+*/
+export interface AddAdmin {
+  args: {
+    account_id: AccountId;
+  };
+  options: {
+    /** Units in gas
+    * @pattern [0-9]+
+    * @default "30000000000000"
+    */
+    gas?: string;
+    /** Units in yoctoNear
+    * @default "0"
+    */
+    attachedDeposit?: Balance;
+  }
+  
+}
+export type AddAdmin__Result = boolean;
 /**
 * 
 * @contractMethod view
 */
-export interface CostPerToken {
-  args: {};
+export interface NftPayout {
+  args: {
+    token_id: string;
+    balance: U128;
+    max_len_payout?: u32;
+  };
   
 }
-export type CostPerToken__Result = U128;
+export type NftPayout__Result = Payout;
+/**
+* 
+* @contractMethod change
+*/
+export interface NftTransferPayout {
+  args: {
+    receiver_id: AccountId;
+    token_id: string;
+    approval_id?: u64;
+    memo?: string;
+    balance: U128;
+    max_len_payout?: u32;
+  };
+  options: {
+    /** Units in gas
+    * @pattern [0-9]+
+    * @default "30000000000000"
+    */
+    gas?: string;
+    /** Units in yoctoNear
+    * @default "0"
+    */
+    attachedDeposit?: Balance;
+  }
+  
+}
+export type NftTransferPayout__Result = Payout;
 /**
 * Simple transfer. Transfer a given `token_id` from current owner to
 * `receiver_id`.
@@ -974,86 +1249,6 @@ export interface NftTransfer {
   
 }
 export type NftTransfer__Result = void;
-/**
-* Check if a token is approved for transfer by a given account, optionally
-* checking an approval_id
-* 
-* Arguments:
-* * `token_id`: the token for which to revoke an approval
-* * `approved_account_id`: the account to check the existence of in `approvals`
-* * `approval_id`: an optional approval ID to check against current approval ID for given account
-* 
-* Returns:
-* if `approval_id` given, `true` if `approved_account_id` is approved with given `approval_id`
-* otherwise, `true` if `approved_account_id` is in list of approved accounts
-* 
-* @contractMethod view
-*/
-export interface NftIsApproved {
-  args: {
-    token_id: TokenId;
-    approved_account_id: AccountId;
-    approval_id?: u64;
-  };
-  
-}
-export type NftIsApproved__Result = boolean;
-/**
-* 
-* @contractMethod change
-*/
-export interface UpdateUri {
-  args: {
-    uri: string;
-  };
-  options: {
-    /** Units in gas
-    * @pattern [0-9]+
-    * @default "30000000000000"
-    */
-    gas?: string;
-    /** Units in yoctoNear
-    * @default "0"
-    */
-    attachedDeposit?: Balance;
-  }
-  
-}
-export type UpdateUri__Result = void;
-/**
-* 
-* @contractMethod view
-*/
-export interface NftPayout {
-  args: {
-    token_id: string;
-    balance: U128;
-    max_len_payout?: u32;
-  };
-  
-}
-export type NftPayout__Result = Payout;
-/**
-* Get a list of all tokens
-* 
-* Arguments:
-* * `from_index`: a string representing an unsigned 128-bit integer,
-* representing the starting index of tokens to return. (default 0)
-* * `limit`: the maximum number of tokens to return (default total supply)
-* Could fail on gas
-* 
-* Returns an array of Token objects, as described in Core standard
-* 
-* @contractMethod view
-*/
-export interface NftTokens {
-  args: {
-    from_index?: U128;
-    limit?: u64;
-  };
-  
-}
-export type NftTokens__Result = Token[];
 /**
 * Transfer token and call a method on a receiver contract. A successful
 * workflow will end in a success execution outcome to the callback on the NFT
@@ -1114,103 +1309,6 @@ export interface NftTransferCall {
 }
 export type NftTransferCall__Result = void;
 /**
-* 
-* @contractMethod view
-*/
-export interface TotalCost {
-  args: {
-    num: u32;
-  };
-  
-}
-export type TotalCost__Result = U128;
-/**
-* 
-* @contractMethod change
-*/
-export interface NftTransferPayout {
-  args: {
-    receiver_id: AccountId;
-    token_id: string;
-    approval_id?: u64;
-    memo?: string;
-    balance: U128;
-    max_len_payout?: u32;
-  };
-  options: {
-    /** Units in gas
-    * @pattern [0-9]+
-    * @default "30000000000000"
-    */
-    gas?: string;
-    /** Units in yoctoNear
-    * @default "0"
-    */
-    attachedDeposit?: Balance;
-  }
-  
-}
-export type NftTransferPayout__Result = Payout;
-/**
-* Revoke an approved account for a specific token.
-* 
-* Requirements
-* * Caller of the method must attach a deposit of 1 yoctoⓃ for security
-* purposes
-* * If contract requires >1yN deposit on `nft_approve`, contract
-* MUST refund associated storage deposit when owner revokes approval
-* * Contract MUST panic if called by someone other than token owner
-* 
-* Arguments:
-* * `token_id`: the token for which to revoke an approval
-* * `account_id`: the account to remove from `approvals`
-* 
-* @contractMethod change
-*/
-export interface NftRevoke {
-  args: {
-    token_id: TokenId;
-    account_id: AccountId;
-  };
-  options: {
-    /** Units in gas
-    * @pattern [0-9]+
-    * @default "30000000000000"
-    */
-    gas?: string;
-    /** Units in yoctoNear
-    * @default "0"
-    */
-    attachedDeposit?: Balance;
-  }
-  
-}
-export type NftRevoke__Result = void;
-/**
-* 
-* @contractMethod change
-*/
-export interface New {
-  args: {
-    owner_id: AccountId;
-    metadata: NftContractMetadata;
-    size: u32;
-  };
-  options: {
-    /** Units in gas
-    * @pattern [0-9]+
-    * @default "30000000000000"
-    */
-    gas?: string;
-    /** Units in yoctoNear
-    * @default "0"
-    */
-    attachedDeposit?: Balance;
-  }
-  
-}
-export type New__Result = void;
-/**
 * Returns the token with the given `token_id` or `null` if no such token.
 * 
 * @contractMethod view
@@ -1222,26 +1320,6 @@ export interface NftToken {
   
 }
 export type NftToken__Result = Token | null;
-/**
-* Returns the total supply of non-fungible tokens as a string representing an
-* unsigned 128-bit integer to avoid JSON number limit of 2^53.
-* 
-* @contractMethod view
-*/
-export interface NftTotalSupply {
-  args: {};
-  
-}
-export type NftTotalSupply__Result = U128;
-/**
-* 
-* @contractMethod view
-*/
-export interface TokenStorageCost {
-  args: {};
-  
-}
-export type TokenStorageCost__Result = U128;
 /**
 * Add an approved account for a specific token.
 * 
@@ -1289,6 +1367,130 @@ export interface NftApprove {
 }
 export type NftApprove__Result = void;
 /**
+* Revoke an approved account for a specific token.
+* 
+* Requirements
+* * Caller of the method must attach a deposit of 1 yoctoⓃ for security
+* purposes
+* * If contract requires >1yN deposit on `nft_approve`, contract
+* MUST refund associated storage deposit when owner revokes approval
+* * Contract MUST panic if called by someone other than token owner
+* 
+* Arguments:
+* * `token_id`: the token for which to revoke an approval
+* * `account_id`: the account to remove from `approvals`
+* 
+* @contractMethod change
+*/
+export interface NftRevoke {
+  args: {
+    token_id: TokenId;
+    account_id: AccountId;
+  };
+  options: {
+    /** Units in gas
+    * @pattern [0-9]+
+    * @default "30000000000000"
+    */
+    gas?: string;
+    /** Units in yoctoNear
+    * @default "0"
+    */
+    attachedDeposit?: Balance;
+  }
+  
+}
+export type NftRevoke__Result = void;
+/**
+* Revoke all approved accounts for a specific token.
+* 
+* Requirements
+* * Caller of the method must attach a deposit of 1 yoctoⓃ for security
+* purposes
+* * If contract requires >1yN deposit on `nft_approve`, contract
+* MUST refund all associated storage deposit when owner revokes approvals
+* * Contract MUST panic if called by someone other than token owner
+* 
+* Arguments:
+* * `token_id`: the token with approvals to revoke
+* 
+* @contractMethod change
+*/
+export interface NftRevokeAll {
+  args: {
+    token_id: TokenId;
+  };
+  options: {
+    /** Units in gas
+    * @pattern [0-9]+
+    * @default "30000000000000"
+    */
+    gas?: string;
+    /** Units in yoctoNear
+    * @default "0"
+    */
+    attachedDeposit?: Balance;
+  }
+  
+}
+export type NftRevokeAll__Result = void;
+/**
+* Check if a token is approved for transfer by a given account, optionally
+* checking an approval_id
+* 
+* Arguments:
+* * `token_id`: the token for which to revoke an approval
+* * `approved_account_id`: the account to check the existence of in `approvals`
+* * `approval_id`: an optional approval ID to check against current approval ID for given account
+* 
+* Returns:
+* if `approval_id` given, `true` if `approved_account_id` is approved with given `approval_id`
+* otherwise, `true` if `approved_account_id` is in list of approved accounts
+* 
+* @contractMethod view
+*/
+export interface NftIsApproved {
+  args: {
+    token_id: TokenId;
+    approved_account_id: AccountId;
+    approval_id?: u64;
+  };
+  
+}
+export type NftIsApproved__Result = boolean;
+/**
+* Returns the total supply of non-fungible tokens as a string representing an
+* unsigned 128-bit integer to avoid JSON number limit of 2^53.
+* 
+* @contractMethod view
+*/
+export interface NftTotalSupply {
+  args: {};
+  
+}
+export type NftTotalSupply__Result = U128;
+/**
+* Get a list of all tokens
+* 
+* Arguments:
+* * `from_index`: a string representing an unsigned 128-bit integer,
+* representing the starting index of tokens to return. (default 0)
+* * `limit`: the maximum number of tokens to return (default total supply)
+* Could fail on gas
+* 
+* Returns an array of Token objects, as described in Core standard
+* 
+* @contractMethod view
+*/
+export interface NftTokens {
+  args: {
+    from_index?: U128;
+    limit?: u64;
+  };
+  
+}
+export type NftTokens__Result = Token[];
+/**
 * Get number of tokens owned by a given account
 * 
 * Arguments:
@@ -1307,39 +1509,6 @@ export interface NftSupplyForOwner {
   
 }
 export type NftSupplyForOwner__Result = U128;
-/**
-* 
-* @contractMethod view
-*/
-export interface NftMetadata {
-  args: {};
-  
-}
-export type NftMetadata__Result = NftContractMetadata;
-/**
-* 
-* @contractMethod change
-*/
-export interface NewDefaultMeta {
-  args: {
-    owner_id: AccountId;
-    metadata: InitialMetadata;
-    size: u32;
-  };
-  options: {
-    /** Units in gas
-    * @pattern [0-9]+
-    * @default "30000000000000"
-    */
-    gas?: string;
-    /** Units in yoctoNear
-    * @default "0"
-    */
-    attachedDeposit?: Balance;
-  }
-  
-}
-export type NewDefaultMeta__Result = void;
 /**
 * Get list of all tokens owned by a given account
 * 
@@ -1365,12 +1534,58 @@ export interface NftTokensForOwner {
 export type NftTokensForOwner__Result = Token[];
 /**
 * 
+* @contractMethod view
+*/
+export interface TotalCost {
+  args: {
+    num: u32;
+  };
+  
+}
+export type TotalCost__Result = U128;
+/**
+* 
+* @contractMethod view
+*/
+export interface CostPerToken {
+  args: {};
+  
+}
+export type CostPerToken__Result = U128;
+/**
+* 
+* @contractMethod view
+*/
+export interface TokenStorageCost {
+  args: {};
+  
+}
+export type TokenStorageCost__Result = U128;
+/**
+* 
+* @contractMethod view
+*/
+export interface NftMetadata {
+  args: {};
+  
+}
+export type NftMetadata__Result = NftContractMetadata;
+/**
+* 
+* @contractMethod view
+*/
+export interface CurrentStatus {
+  args: {};
+  
+}
+export type CurrentStatus__Result = string;
+/**
+* 
 * @contractMethod change
 */
-export interface NftMintMany {
+export interface AddAccountsTest {
   args: {
-    token_owners: AccountId[];
-    max: u32;
+    accounts: AccountIdFile;
   };
   options: {
     /** Units in gas
@@ -1385,4 +1600,53 @@ export interface NftMintMany {
   }
   
 }
-export type NftMintMany__Result = void;
+export type AddAccountsTest__Result = void;
+/**
+* Create a new airdrop contract
+* 
+* @contractMethod change
+*/
+export interface NewDefault {
+  args: {
+    owner_id: AccountId;
+    metadata: InitialMetadata;
+    royalties?: Royalties;
+  };
+  options: {
+    /** Units in gas
+    * @pattern [0-9]+
+    * @default "30000000000000"
+    */
+    gas?: string;
+    /** Units in yoctoNear
+    * @default "0"
+    */
+    attachedDeposit?: Balance;
+  }
+  
+}
+export type NewDefault__Result = void;
+/**
+* 
+* @contractMethod change
+*/
+export interface New {
+  args: {
+    owner_id: AccountId;
+    metadata: NftContractMetadata;
+    royalties?: Royalties;
+  };
+  options: {
+    /** Units in gas
+    * @pattern [0-9]+
+    * @default "30000000000000"
+    */
+    gas?: string;
+    /** Units in yoctoNear
+    * @default "0"
+    */
+    attachedDeposit?: Balance;
+  }
+  
+}
+export type New__Result = void;

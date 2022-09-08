@@ -9,7 +9,7 @@ pub struct InitialMetadata {
     // required, ex. "MOSIAC"
     symbol: String,
     /// Centralized gateway known to have reliable access to decentralized storage assets referenced by `reference` or `media` URLs
-    base_uri: String,
+    base_uri: Option<String>,
     /// Data URL
     icon: Option<String>,
     /// a version like "nft-1.0.0" the current default
@@ -27,7 +27,7 @@ impl From<InitialMetadata> for NFTContractMetadata {
             name,
             symbol,
             icon,
-            base_uri: uri,
+            base_uri,
             reference,
             reference_hash,
         } = inital_metadata;
@@ -36,9 +36,14 @@ impl From<InitialMetadata> for NFTContractMetadata {
             name,
             symbol,
             icon,
-            base_uri: Some(uri),
+            base_uri,
             reference,
             reference_hash,
         }
     }
 }
+
+#[witgen]
+/// A file with an account id on each line.
+/// @format data-url
+pub type AccountIdFile = String;

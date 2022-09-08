@@ -1,7 +1,6 @@
 import { NEAR, Gas } from "near-units";
 import { readFile } from "fs/promises";
 import { Context } from "near-cli/context";
-import * as tenk from "..";
 import { binPath } from "./utils";
 import { icon } from "./icon";
 

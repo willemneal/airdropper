@@ -4,6 +4,7 @@ use near_sdk::{
     serde::{Deserialize, Serialize},
     witgen,
 };
+use std::collections::HashSet;
 
 /// Represents an airdrop currently being dropped
 #[witgen]
@@ -27,6 +28,7 @@ pub struct Airdrop {
     pub info: AirdropInfo,
     pub start_index: u64,
     pub owners: UnorderedSet<AccountId>,
+    pub ready: bool,
 }
 
 pub struct AirdropItem {
@@ -50,28 +52,35 @@ impl Airdrop {
             info,
             start_index,
             owners: UnorderedSet::new(StorageKey::Airdrop),
+            ready: false,
         }
     }
 
-    pub fn add_accounts<I>(&mut self, accounts: I) where
-    I: Iterator<Item = PossibleAccountId>
+    pub fn add_accounts<I>(&mut self, accounts: I)
+    where
+        I: Iterator<Item = PossibleAccountId>,
     {
-        let valid_accounts = accounts.into_iter().filter_map(|a| {
+        let valid_accounts = accounts.filter_map(|a| {
             let res = a.parse::<AccountId>().ok();
             if res.is_none() {
                 env::log_str(&format!("Invalid AccountId: {}", a));
             }
             res
-        });
+        }).collect::<HashSet<_>>(); // Remove duplicates
         self.owners.extend(valid_accounts);
+        let (owners, size) = (self.owners.len(), self.info.size as u64);
         require!(
-            self.owners.len() <= self.info.size as u64,
+            owners <= size,
             "too many accounts"
         );
+        if owners == size {
+          self.ready = true;
+        }
     }
 
     pub fn drop_many(&mut self, num: u32) -> Vec<(AccountId, TokenMetadata, TokenId)> {
         if !self.owners.is_empty() {
+            require!(self.ready, "More accounts need to be added");
             let mut res = Vec::with_capacity(num as _);
             for owner_id in self.owners.iter().take(num as usize).collect::<Vec<_>>() {
                 let (metadata, token_id) = self.drop_one(&owner_id);
@@ -86,7 +95,12 @@ impl Airdrop {
     pub fn token_metadata(&self, num: u32) -> TokenMetadata {
         let media = Some(self.info.media.to_string());
         // let reference = Some(format!("{}.json", token_id));
-        let title = Some(format!("{} — {}/{}", self.info.title, num + 1, self.info.size));
+        let title = Some(format!(
+            "{} — {}/{}",
+            self.info.title,
+            num + 1,
+            self.info.size
+        ));
         TokenMetadata {
             title, // ex. "Arch Nemesis: Mail Carrier" or "Parcel #5055"
             media, // URL to associated media, preferably to decentralized, content-addressed storage
@@ -105,13 +119,13 @@ impl Airdrop {
 
     pub fn drop_one(&mut self, account_id: &AccountId) -> (TokenMetadata, TokenId) {
         let num = self.next_num();
-        let token_id = (num + self.start_index).to_string();
+        let token_id = (num + self.start_index + 1).to_string();
         self.owners.remove(account_id);
         (self.token_metadata(num as _), token_id)
     }
 
     pub fn next_num(&self) -> u64 {
-      self.info.size as u64 - self.left()
+        self.info.size as u64 - self.left()
     }
 
     pub fn left(&self) -> u64 {
