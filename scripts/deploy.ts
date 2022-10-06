@@ -3,17 +3,21 @@ import { readFile } from "fs/promises";
 import { Context } from "near-cli/context";
 import { binPath } from "./utils";
 import { icon } from "./icon";
+// import airdrop from "..";
+import { NewDefault, InitialMetadata, Contract } from "..";
 
-const metadata: tenk.InitialMetadata = {
-  uri: "https://bafybeig2n3snesybecbnnypextbehyak54rdqeempffbvu5jqrp3oejnj4.ipfs.dweb.link",
-  name: "The Auction",
-  symbol: "the-auction",
+const metadata: InitialMetadata  = {
+  // base_uri: "https://bafybeig2n3snesybecbnnypextbehyak54rdqeempffbvu5jqrp3oejnj4.ipfs.dweb.link",
+  name: "Air Drop Me",
+  symbol: "ADM",
   icon,
 };
 
+type InitArgs = NewDefault["args"];
+
 export async function main({ account, nearAPI, argv, near }: Context) {
   let { Account } = nearAPI;
-  const contractBytes = await readFile(binPath("tenk"));
+  const contractBytes = await readFile(binPath("airdrop"));
 
   let [contractId] = argv ?? [];
   contractId = contractId ?? account.accountId;
@@ -22,13 +26,12 @@ export async function main({ account, nearAPI, argv, near }: Context) {
   const isTestnet = contractId.endsWith("testnet");
   
 
-  const initialArgs = {
+  const initialArgs: InitArgs  = {
     owner_id: account.accountId,
     metadata,
-    size: 2_000
   };
 
-  const contract = new tenk.Contract(account, contractId);
+  const contract = new Contract(account, contractId);
 
   const tx = account
     .createTransaction(contractId)
@@ -37,7 +40,7 @@ export async function main({ account, nearAPI, argv, near }: Context) {
   if (await contractAccount.hasDeployedContract()) {
     console.log(`initializing with: \n${JSON.stringify(initialArgs, null, 2)}`);
     tx.actions.push(
-      contract.new_default_metaTx(initialArgs, { gas: Gas.parse("50Tgas") })
+      contract.new_defaultTx(initialArgs, { gas: Gas.parse("50Tgas") })
     );
   }
   let res = await tx.signAndSend();

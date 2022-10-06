@@ -51,9 +51,8 @@ impl Contract {
     }
 
     /// Drop a set of NFTs in current campaign
-    /// @allow ["::admins", "::owner"]
     pub fn drop_many(&mut self, num: u32) {
-        self.assert_owner_or_admin();
+        // self.assert_owner_or_admin();
         let airdrop = self.airdrop.as_mut().expect("No current airdrop");
         let tokens = airdrop
             .drop_many(num)

@@ -30,12 +30,20 @@ impl Contract {
         }
     }
 
-    pub fn add_accounts_test(&mut self, accounts: AccountIdFile) {
+    pub fn add_accounts_test(&self, accounts: AccountIdFile) {
         let accounts = data_url_to_string(&accounts);
         env::log_str(&format!("{}", env::used_gas().0));
         let res = string_to_line_iter(&accounts).collect::<Vec<_>>();
         env::log_str(&res.len().to_string());
         env::log_str(&format!("{}", env::used_gas().0));
         env::log_str(&format!("{:#?}", res));
+    }
+
+    pub fn owner(&self) -> AccountId {
+        self.tokens.owner_id.clone()
+    }
+
+    pub fn admins(&self) -> Vec<AccountId> {
+        self.admins.to_vec()
     }
 }

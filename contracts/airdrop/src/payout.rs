@@ -62,10 +62,9 @@ impl Payouts for Contract {
             .owner_by_id
             .get(&token_id)
             .expect("No such token_id");
-        self.royalties.as_ref().map_or_else(
-            || Payout::default(),
-            |r| r.create_payout(balance.0, &owner_id),
-        )
+        self.royalties
+            .as_ref()
+            .map_or_else(Payout::default, |r| r.create_payout(balance.0, &owner_id))
     }
 
     #[payable]
@@ -141,9 +140,9 @@ impl Royalties {
         payout
     }
 
-    pub(crate) fn send_funds(&self, balance: Balance, owner_id: &AccountId) {
-        self.create_payout(balance, owner_id).send_funds();
-    }
+    // pub(crate) fn send_funds(&self, balance: Balance, owner_id: &AccountId) {
+    //     self.create_payout(balance, owner_id).send_funds();
+    // }
 }
 
 fn apply_percent(percent: BasisPoint, int: u128) -> u128 {

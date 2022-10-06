@@ -31,20 +31,12 @@ pub struct Airdrop {
     pub ready: bool,
 }
 
-pub struct AirdropItem {
-    title: String,
-}
-
 /// Potentially valid account id
 /// @minLength 2
 /// @maxLength 64
 /// @pattern ^(([a-z\d]+[-_])*[a-z\d]+\.)*([a-z\d]+[-_])*[a-z\d]+$
 #[witgen]
 pub type PossibleAccountId = String;
-
-/// @format data-url
-#[witgen]
-pub type Accounts = Vec<PossibleAccountId>;
 
 impl Airdrop {
     pub fn new(info: AirdropInfo, start_index: u64) -> Self {
